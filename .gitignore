@@ -1,0 +1,23 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local/runtime files
+backend/storage/logs/
+backend/storage/framework/
+backend/storage/cache/
+backend/storage/sessions/
+
+# Dependencies and generated assets
+**/node_modules/
+**/vendor/
+**/dist/
+**/build/
+
+# IDE and OS files
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
