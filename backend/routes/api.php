@@ -60,7 +60,7 @@ return static function (Router $router): void {
     // ------------------------------------------------------------------
     // Quản trị (Bearer token + phân quyền)
     // ------------------------------------------------------------------
-    $router->group('/api/admin', [AuthMiddleware::class, [RoleMiddleware::class, ['admin', 'business']]], static function (Router $router): void {
+    $router->group('/api/admin', [AuthMiddleware::class, [RoleMiddleware::class, ['admin', 'business']], CsrfMiddleware::class], static function (Router $router): void {
         $router->get('/auth/me', [AuthController::class, 'me']);
         $router->post('/auth/logout', [AuthController::class, 'logout']);
         $router->post('/auth/change-password', [AuthController::class, 'changePassword']);

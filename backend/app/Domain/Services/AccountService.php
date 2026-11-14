@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
-use App\Core\Config;
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Request;
 use App\Domain\Enums\Role;
@@ -95,11 +94,11 @@ final class AccountService
         $current = $this->find($id);
 
         $rules = [
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|phone',
-            'role' => 'nullable|in:admin,business,customer',
-            'password' => 'nullable|string|min:8|max:255',
-            'is_active' => 'nullable|boolean',
+            'email' => 'sometimes|nullable|email|max:255',
+            'phone' => 'sometimes|nullable|phone',
+            'role' => 'sometimes|required|in:admin,business,customer',
+            'password' => 'sometimes|nullable|string|min:8|max:255',
+            'is_active' => 'sometimes|nullable|boolean',
         ];
         $data = Validator::validate(array_intersect_key($input, $rules), $rules);
         $data = array_intersect_key($data, $input);
@@ -165,10 +164,5 @@ final class AccountService
         $this->sessions->deactivateAllForUser($id);
         $this->users->delete($id);
         $this->audit->log($request, 'user_delete', 'users', $id, 'Xóa tài khoản ' . $user['username']);
-    }
-
-    public function passwordMinLength(): int
-    {
-        return (int) Config::get('auth.password_min_length', 8);
     }
 }

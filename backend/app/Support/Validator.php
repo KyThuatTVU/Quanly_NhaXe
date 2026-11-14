@@ -81,6 +81,9 @@ final class Validator
 
         foreach ($rules as $field => $ruleString) {
             $ruleList = explode('|', $ruleString);
+            if (in_array('sometimes', $ruleList, true) && !array_key_exists($field, $data)) {
+                continue;
+            }
             $nullable = in_array('nullable', $ruleList, true);
             $value = $data[$field] ?? null;
             if (is_string($value)) {
@@ -100,8 +103,9 @@ final class Validator
                 continue;
             }
 
+            $numeric = in_array('numeric', $ruleList, true) || in_array('integer', $ruleList, true);
             foreach ($ruleList as $rule) {
-                $error = self::check($rule, $value, $label);
+                $error = self::check($rule, $value, $label, $numeric);
                 if ($error !== null) {
                     $errors[$field] = $error;
                     break;
@@ -116,12 +120,12 @@ final class Validator
         return $clean;
     }
 
-    private static function check(string $rule, mixed $value, string $label): ?string
+    private static function check(string $rule, mixed $value, string $label, bool $numeric): ?string
     {
         [$name, $param] = array_pad(explode(':', $rule, 2), 2, null);
 
         return match ($name) {
-            'required', 'nullable' => null,
+            'required', 'nullable', 'sometimes' => null,
             'string' => is_string($value) ? null : "{$label} phải là chuỗi.",
             'integer' => filter_var($value, FILTER_VALIDATE_INT) !== false ? null : "{$label} phải là số nguyên.",
             'numeric' => is_numeric($value) ? null : "{$label} phải là số.",
@@ -132,24 +136,24 @@ final class Validator
             'date' => self::isDate((string) $value) ? null : "{$label} phải có định dạng YYYY-MM-DD.",
             'time' => preg_match('/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', (string) $value) === 1 ? null : "{$label} phải có định dạng HH:MM.",
             'today_or_future' => self::isDate((string) $value) && $value >= date('Y-m-d') ? null : "{$label} không được ở quá khứ.",
-            'min' => self::checkMin($value, (float) $param, $label),
-            'max' => self::checkMax($value, (float) $param, $label),
+            'min' => self::checkMin($value, (float) $param, $label, $numeric),
+            'max' => self::checkMax($value, (float) $param, $label, $numeric),
             'in' => in_array((string) $value, explode(',', (string) $param), true) ? null : "{$label} không hợp lệ.",
             default => null,
         };
     }
 
-    private static function checkMin(mixed $value, float $min, string $label): ?string
+    private static function checkMin(mixed $value, float $min, string $label, bool $numeric): ?string
     {
-        if (is_numeric($value)) {
+        if ($numeric) {
             return (float) $value >= $min ? null : "{$label} phải lớn hơn hoặc bằng {$min}.";
         }
         return mb_strlen((string) $value) >= $min ? null : "{$label} phải có ít nhất {$min} ký tự.";
     }
 
-    private static function checkMax(mixed $value, float $max, string $label): ?string
+    private static function checkMax(mixed $value, float $max, string $label, bool $numeric): ?string
     {
-        if (is_numeric($value)) {
+        if ($numeric) {
             return (float) $value <= $max ? null : "{$label} phải nhỏ hơn hoặc bằng {$max}.";
         }
         return mb_strlen((string) $value) <= $max ? null : "{$label} không được vượt quá {$max} ký tự.";

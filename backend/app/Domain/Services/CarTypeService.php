@@ -97,9 +97,9 @@ final class CarTypeService
         $this->find($id);
 
         $rules = [
-            'name' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255',
-            'seats' => 'nullable|integer|min:1|max:100',
+            'name' => 'sometimes|required|string|max:255',
+            'slug' => 'sometimes|nullable|string|max:255',
+            'seats' => 'sometimes|required|integer|min:1|max:100',
             'seats_min' => 'nullable|integer|min:1|max:100',
             'seats_max' => 'nullable|integer|min:1|max:100',
             'description' => 'nullable|string|max:5000',

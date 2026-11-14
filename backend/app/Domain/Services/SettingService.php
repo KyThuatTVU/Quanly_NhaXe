@@ -45,24 +45,31 @@ final class SettingService
     public function update(array $input, Request $request): array
     {
         $rules = [
-            'company_name' => 'nullable|string|max:200',
-            'address' => 'nullable|string|max:500',
-            'phone' => 'nullable|string|max:20',
-            'hotline' => 'nullable|string|max:20',
-            'zalo' => 'nullable|string|max:20',
-            'facebook' => 'nullable|string|max:500',
-            'email' => 'nullable|email|max:255',
-            'working_hours' => 'nullable|string|max:100',
-            'map_location' => 'nullable|string|max:500',
-            'description' => 'nullable|string|max:5000',
+            'company_name' => 'sometimes|nullable|string|max:200',
+            'address' => 'sometimes|nullable|string|max:500',
+            'phone' => 'sometimes|nullable|string|max:20',
+            'hotline' => 'sometimes|nullable|string|max:20',
+            'zalo' => 'sometimes|nullable|string|max:20',
+            'facebook' => 'sometimes|nullable|string|max:500',
+            'email' => 'sometimes|nullable|email|max:255',
+            'working_hours' => 'sometimes|nullable|string|max:100',
+            'map_location' => 'sometimes|nullable|string|max:500',
+            'description' => 'sometimes|nullable|string|max:5000',
         ];
         $data = Validator::validate(array_intersect_key($input, $rules), $rules);
         $data = array_intersect_key($data, $input);
 
-        if (array_key_exists('phone', $data) && $data['phone'] !== null && !Validator::isPhone((string) $data['phone'])) {
+        foreach (['company_name', 'phone', 'zalo'] as $required) {
+            if (array_key_exists($required, $data) && $data[$required] === null) {
+                $data[$required] = '';
+            }
+        }
+
+        if (array_key_exists('phone', $data) && $data['phone'] !== '' && !Validator::isPhone((string) $data['phone'])) {
             throw new BusinessRuleException('Số điện thoại công ty không đúng định dạng');
         }
-        if (array_key_exists('hotline', $data) && $data['hotline'] !== null && !Validator::isPhone((string) $data['hotline'])) {
+        if (array_key_exists('hotline', $data) && $data['hotline'] !== null && $data['hotline'] !== ''
+            && preg_match('/^[0-9][0-9 .\-]{4,18}[0-9]$/', (string) $data['hotline']) !== 1) {
             throw new BusinessRuleException('Hotline không đúng định dạng');
         }
 

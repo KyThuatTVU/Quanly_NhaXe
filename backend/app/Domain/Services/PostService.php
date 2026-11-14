@@ -116,12 +116,12 @@ final class PostService
         $current = $this->find($id);
 
         $rules = [
-            'title' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255',
-            'content' => 'nullable|string',
-            'image' => 'nullable|string|max:255',
-            'category' => 'nullable|string|max:50',
-            'status' => 'nullable|in:draft,published',
+            'title' => 'sometimes|required|string|max:255',
+            'slug' => 'sometimes|nullable|string|max:255',
+            'content' => 'sometimes|nullable|string',
+            'image' => 'sometimes|nullable|string|max:255',
+            'category' => 'sometimes|nullable|string|max:50',
+            'status' => 'sometimes|required|in:draft,published',
         ];
         $data = Validator::validate(array_intersect_key($input, $rules), $rules);
         $data = array_intersect_key($data, $input);

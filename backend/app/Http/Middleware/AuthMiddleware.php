@@ -18,7 +18,7 @@ final class AuthMiddleware implements MiddlewareInterface
 
     public function handle(Request $request, callable $next): Response
     {
-        $token = $this->token($request);
+        [$token, $via] = $this->token($request);
         if ($token === null || $token === '') {
             throw new UnauthorizedException('Vui lòng đăng nhập để tiếp tục');
         }
@@ -33,22 +33,26 @@ final class AuthMiddleware implements MiddlewareInterface
 
         $request->setAttribute('auth', $session);
         $request->setAttribute('auth_token', $token);
+        $request->setAttribute('auth_via', $via);
         $this->sessions->touch($token);
 
         return $next($request);
     }
 
-    private function token(Request $request): ?string
+    /**
+     * @return array{0: string|null, 1: string}
+     */
+    private function token(Request $request): array
     {
         $header = (string) $request->header('authorization', '');
         if (preg_match('/^Bearer\s+(.+)$/i', $header, $matches) === 1) {
-            return trim($matches[1]);
+            return [trim($matches[1]), 'bearer'];
         }
         $token = $request->header('x-auth-token');
         if ($token !== null && $token !== '') {
-            return $token;
+            return [$token, 'bearer'];
         }
         $sessionToken = Session::get('auth_token');
-        return is_string($sessionToken) ? $sessionToken : null;
+        return [is_string($sessionToken) ? $sessionToken : null, 'session'];
     }
 }

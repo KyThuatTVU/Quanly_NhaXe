@@ -83,13 +83,13 @@ final class ServiceCatalogService
         $current = $this->find($id);
 
         $rules = [
-            'service_name' => 'nullable|string|max:100',
-            'slug' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:5000',
-            'price' => 'nullable|numeric|min:0',
-            'image' => 'nullable|string|max:255',
-            'display_order' => 'nullable|integer',
-            'is_active' => 'nullable|boolean',
+            'service_name' => 'sometimes|required|string|max:100',
+            'slug' => 'sometimes|nullable|string|max:255',
+            'description' => 'sometimes|nullable|string|max:5000',
+            'price' => 'sometimes|nullable|numeric|min:0',
+            'image' => 'sometimes|nullable|string|max:255',
+            'display_order' => 'sometimes|nullable|integer',
+            'is_active' => 'sometimes|nullable|boolean',
         ];
         $data = Validator::validate(array_intersect_key($input, $rules), $rules);
         $data = array_intersect_key($data, $input);

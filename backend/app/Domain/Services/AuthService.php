@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Domain\Services;
 
 use App\Core\Config;
+use App\Core\Exceptions\ForbiddenException;
+use App\Core\Exceptions\UnauthorizedException;
 use App\Core\Request;
 use App\Domain\Exceptions\BusinessRuleException;
 use App\Infrastructure\Logging\AuditLogger;
@@ -29,13 +31,13 @@ final class AuthService
         $user = $this->users->findByLogin($login);
         if ($user === null || empty($user['password']) || !password_verify($password, (string) $user['password'])) {
             $this->audit->log($request, 'login_failed', 'users', null, 'Sai thông tin đăng nhập: ' . $login);
-            throw new BusinessRuleException('Tên đăng nhập hoặc mật khẩu không đúng');
+            throw new UnauthorizedException('Tên đăng nhập hoặc mật khẩu không đúng');
         }
         if ((int) $user['is_active'] !== 1) {
-            throw new BusinessRuleException('Tài khoản đã bị khóa, vui lòng liên hệ quản trị viên');
+            throw new ForbiddenException('Tài khoản đã bị khóa, vui lòng liên hệ quản trị viên');
         }
         if (!in_array($user['role'], (array) Config::get('auth.admin_roles', []), true)) {
-            throw new BusinessRuleException('Tài khoản này không có quyền truy cập trang quản trị');
+            throw new ForbiddenException('Tài khoản này không có quyền truy cập trang quản trị');
         }
 
         $lifetime = (int) Config::get('auth.session_lifetime', 1440);
@@ -45,6 +47,7 @@ final class AuthService
         $this->sessions->deleteExpired();
         $this->sessions->create($token, (int) $user['user_id'], $request->ip(), (string) $request->header('user-agent', ''), $expiresAt);
         $this->users->touchLogin((int) $user['user_id']);
+        $user = $this->users->find((int) $user['user_id']) ?? $user;
 
         $request->setAttribute('auth', $user);
         $this->audit->log($request, 'login', 'users', (int) $user['user_id'], 'Đăng nhập quản trị');
@@ -66,7 +69,7 @@ final class AuthService
 
     public function changePassword(array $user, string $currentPassword, string $newPassword): void
     {
-        $fresh = $this->users->find((int) $user['user_id']);
+        $fresh = $this->users->findByLogin((string) $user['username']);
         if ($fresh === null) {
             throw new BusinessRuleException('Không tìm thấy tài khoản');
         }

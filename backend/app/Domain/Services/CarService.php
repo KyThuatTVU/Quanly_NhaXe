@@ -97,14 +97,14 @@ final class CarService
         $this->find($id);
 
         $rules = [
-            'name' => 'nullable|string|max:100',
-            'vehicle_type_id' => 'nullable|integer',
-            'type' => 'nullable|string|max:50',
-            'image' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:5000',
-            'price_per_km' => 'nullable|numeric|min:0',
-            'price_per_day' => 'nullable|numeric|min:0',
-            'status' => 'nullable|in:available,unavailable',
+            'name' => 'sometimes|required|string|max:100',
+            'vehicle_type_id' => 'sometimes|nullable|integer',
+            'type' => 'sometimes|nullable|string|max:50',
+            'image' => 'sometimes|nullable|string|max:255',
+            'description' => 'sometimes|nullable|string|max:5000',
+            'price_per_km' => 'sometimes|nullable|numeric|min:0',
+            'price_per_day' => 'sometimes|nullable|numeric|min:0',
+            'status' => 'sometimes|required|in:available,unavailable',
             'driver_info' => 'nullable|string|max:2000',
             'insurance_info' => 'nullable|string|max:2000',
         ];

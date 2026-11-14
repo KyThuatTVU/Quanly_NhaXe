@@ -18,8 +18,8 @@ final class CsrfMiddleware implements MiddlewareInterface
         if (in_array($request->method(), self::SAFE_METHODS, true)) {
             return $next($request);
         }
-        // Request đã xác thực bằng Bearer token không bị tấn công CSRF (token không tự gửi theo cookie).
-        if ($request->attribute('auth') !== null) {
+        // Bearer token không tự gửi theo cookie nên không bị CSRF; auth qua cookie phiên thì vẫn phải có token.
+        if ($request->attribute('auth_via') === 'bearer') {
             return $next($request);
         }
 
