@@ -65,6 +65,6 @@ final class ContactController extends AdminController
         $id = $this->intParam($id);
         $this->contacts->delete($id, $request);
         Flash::put('success', 'Đã xóa liên hệ #' . $id);
-        return $this->back($request, '/admin/contacts');
+        return $this->redirect('/admin/contacts');
     }
 }

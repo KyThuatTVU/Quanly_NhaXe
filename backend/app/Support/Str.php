@@ -41,7 +41,7 @@ final class Str
         return trim($text, '-');
     }
 
-    public static function bookingCode(string $prefix = 'TV'): string
+    public static function bookingCode(string $prefix = 'DX'): string
     {
         return $prefix . date('ymd') . strtoupper(bin2hex(random_bytes(2)));
     }

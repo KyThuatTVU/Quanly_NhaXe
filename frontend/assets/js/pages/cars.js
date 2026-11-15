@@ -7,6 +7,7 @@ import {
   setAlert,
   escapeHtml,
 } from '../site.js';
+import { liveRefresh, sameJson } from '../live.js';
 
 const alertBox = document.getElementById('page-alert');
 const grid = document.getElementById('vehicle-grid');
@@ -16,25 +17,42 @@ const searchInput = document.getElementById('search-input');
 
 await initLayout('cars');
 
-const params = new URLSearchParams(window.location.search);
-const initialType = params.get('vehicle_type_id') || '';
-const initialSearch = params.get('search') || '';
+const initialType = queryParam('vehicle_type_id');
+const initialSearch = queryParam('search');
 searchInput.value = initialSearch;
 
-try {
-  const response = await get('/api/vehicle-types', { auth: false });
-  typeSelect.innerHTML = '<option value="">Tất cả dòng xe</option>' + (response.data || [])
-    .map((type) => `<option value="${type.id}"${String(type.id) === initialType ? ' selected' : ''}>${escapeHtml(type.name)}</option>`)
+let typeOptions = [];
+let lastListSignature = '';
+
+function renderTypeOptions() {
+  const current = typeSelect.value;
+  typeSelect.innerHTML = '<option value="">Tất cả dòng xe</option>' + typeOptions
+    .map((type) => `<option value="${type.id}">${escapeHtml(type.name)}</option>`)
     .join('');
+  typeSelect.value = current || initialType;
+}
+
+async function loadVehicleTypes() {
+  const response = await get('/api/vehicle-types', { auth: false });
+  const options = (response.data || []).map((type) => ({ id: type.id, name: type.name }));
+  if (sameJson(options, typeOptions)) return;
+  typeOptions = options;
+  renderTypeOptions();
+}
+
+try {
+  await loadVehicleTypes();
 } catch {
   typeSelect.innerHTML = '<option value="">Tất cả dòng xe</option>';
 }
 
-async function loadVehicles() {
+async function loadVehicles({ showLoading = false } = {}) {
   const vehicleTypeId = typeSelect.value;
   const search = searchInput.value.trim();
-  setAlert(alertBox, '');
-  grid.innerHTML = '<p class="muted">Đang tải danh sách xe...</p>';
+  if (showLoading) {
+    setAlert(alertBox, '');
+    grid.innerHTML = '<p class="muted">Đang tải danh sách xe...</p>';
+  }
 
   try {
     const response = await get('/api/vehicles', {
@@ -42,24 +60,37 @@ async function loadVehicles() {
       query: { vehicle_type_id: vehicleTypeId, search },
     });
     const items = response.data || [];
-    grid.innerHTML = items.length > 0
-      ? items.map(vehicleCard).join('')
-      : emptyState('Không có xe phù hợp với bộ lọc.');
+    const model = { vehicleTypeId, search, items };
+
+    if (!sameJson(model, lastListSignature)) {
+      lastListSignature = model;
+      grid.innerHTML = items.length > 0
+        ? items.map(vehicleCard).join('')
+        : emptyState('Không có xe phù hợp với bộ lọc.');
+    }
 
     const next = new URLSearchParams();
     if (vehicleTypeId) next.set('vehicle_type_id', vehicleTypeId);
     if (search) next.set('search', search);
     const query = next.toString();
-    history.replaceState(null, '', query ? `?${query}` : window.location.pathname);
+    const target = query ? `?${query}` : window.location.pathname;
+    if (window.location.pathname + window.location.search !== target) {
+      history.replaceState(null, '', target);
+    }
   } catch (error) {
-    grid.innerHTML = '';
-    setAlert(alertBox, error.message || 'Không tải được danh sách xe.');
+    if (showLoading) {
+      grid.innerHTML = '';
+      setAlert(alertBox, error.message || 'Không tải được danh sách xe.');
+    }
   }
 }
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
-  loadVehicles();
+  loadVehicles({ showLoading: true });
 });
 
-loadVehicles();
+await loadVehicles({ showLoading: true });
+
+liveRefresh(loadVehicles, { interval: 20, immediate: false });
+liveRefresh(loadVehicleTypes, { interval: 60, immediate: false });

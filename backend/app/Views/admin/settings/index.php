@@ -11,8 +11,9 @@
 
     <div class="form-grid">
         <div class="form-field">
-            <label for="company_name">Tên công ty</label>
-            <input id="company_name" name="company_name" value="<?= e(old('company_name', $settings['company_name'] ?? '')) ?>" maxlength="200">
+            <label for="company_name">Tên nhà xe / thương hiệu</label>
+            <input id="company_name" name="company_name" value="<?= e(old('company_name', $settings['company_name'] ?? '')) ?>" maxlength="200" placeholder="VD: Nhà xe An Phú">
+            <small class="muted">Tên này hiển thị ở tiêu đề tab, header, footer, trang đăng nhập và trang quản trị.</small>
             <?php if (error_for('company_name')): ?><small class="field-error"><?= e(error_for('company_name')) ?></small><?php endif; ?>
         </div>
         <div class="form-field">

@@ -63,7 +63,7 @@
         </div>
         <div class="grid grid-3">
             <?php foreach ($cars as $car): ?>
-                <?php $view->partial('partials/car-card', ['car' => $car]); ?>
+                <?php $view->partial('partials/car-card', ['car' => $car, 'site' => $site]); ?>
             <?php endforeach; ?>
             <?php if ($cars === []): ?>
                 <p class="muted">Hiện chưa có xe sẵn sàng. Vui lòng liên hệ hotline để được hỗ trợ.</p>

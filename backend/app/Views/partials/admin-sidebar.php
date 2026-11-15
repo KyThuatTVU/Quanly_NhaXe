@@ -1,6 +1,8 @@
 <?php
 $path = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 $isAdmin = ($currentUser['role'] ?? '') === 'admin';
+$brandName = trim((string) ($site['name'] ?? '')) ?: 'Nhà xe';
+$brandInitials = brand_initials($brandName);
 $isActive = static function (string $target) use ($path): string {
     $base = rtrim((string) parse_url(url($target), PHP_URL_PATH), '/');
     if ($target === '/admin') {
@@ -11,9 +13,9 @@ $isActive = static function (string $target) use ($path): string {
 ?>
 <aside class="admin-sidebar">
     <a class="admin-brand" href="<?= url('/admin') ?>">
-        <span class="brand-mark">TV</span>
+        <span class="brand-mark"><?= e($brandInitials) ?></span>
         <span>
-            <strong>Tháo Vy</strong>
+            <strong><?= e($brandName) ?></strong>
             <small>Trang quản trị</small>
         </span>
     </a>

@@ -1,4 +1,5 @@
-import { get, assetUrl, API_BASE } from './api.js';
+import { get, assetUrl, siteBase } from './api.js';
+import { sameJson } from './live.js';
 
 const NAV_ITEMS = [
   { key: 'home', label: 'Trang chủ', path: '/home/' },
@@ -17,22 +18,51 @@ const STATUS_LABELS = {
   cancelled: ['Đã huỷ', 'neutral'],
 };
 
-function frontendRoot() {
-  const marker = window.location.pathname.indexOf('/frontend/');
-  if (marker >= 0) {
-    return window.location.origin + window.location.pathname.slice(0, marker) + '/frontend';
-  }
-  return window.location.origin;
+export const SITE_BASE = siteBase();
+
+export const FALLBACK_SITE_NAME = 'Nhà xe';
+
+let currentSettings = {};
+let renderedBrand = '';
+let layoutActive = '';
+let settingsTimer = null;
+const settingsListeners = new Set();
+
+export function brandName(settings = currentSettings) {
+  const name = String(settings?.company_name ?? '').trim();
+  return name || FALLBACK_SITE_NAME;
 }
 
-export const FRONTEND_ROOT = frontendRoot();
+export function brandInitials(name = brandName()) {
+  const words = String(name).trim().split(/\s+/).filter(Boolean);
+  let initials = '';
+  for (const word of words) {
+    initials += Array.from(word)[0] || '';
+    if (Array.from(initials).length >= 2) break;
+  }
+  return (initials || Array.from(String(name))[0] || FALLBACK_SITE_NAME).toUpperCase();
+}
+
+export function siteName() {
+  return brandName();
+}
+
+export function currentSiteSettings() {
+  return currentSettings;
+}
+
+/** Đăng ký nhận thông báo khi admin thay đổi cài đặt (tên nhà xe, hotline...). */
+export function onSettingsChange(listener) {
+  settingsListeners.add(listener);
+  return () => settingsListeners.delete(listener);
+}
 
 export function pageUrl(path = '/') {
-  return `${FRONTEND_ROOT}/pages${path.startsWith('/') ? path : `/${path}`}`;
+  return `${SITE_BASE}/${String(path).replace(/^\/+/, '')}`;
 }
 
 export function assetPath(path) {
-  return `${FRONTEND_ROOT}/assets/${String(path).replace(/^\/+/, '')}`;
+  return `${SITE_BASE}/assets/${String(path).replace(/^\/+/, '')}`;
 }
 
 const ESCAPE_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -75,7 +105,7 @@ export function mediaHtml(source, alt = '') {
   if (source) {
     return `<div class="media"><img src="${escapeHtml(assetUrl(source))}" alt="${escapeHtml(alt)}" loading="lazy"></div>`;
   }
-  return '<div class="media media--empty" aria-hidden="true">THÁO VY</div>';
+  return `<div class="media media--empty" aria-hidden="true">${escapeHtml(brandInitials())}</div>`;
 }
 
 export function vehicleCard(vehicle) {
@@ -181,7 +211,8 @@ export function loadSettings(force = false) {
 }
 
 function renderHeader(settings, active) {
-  const name = escapeHtml(settings.company_name || 'Xe Hợp Đồng Tháo Vy');
+  const name = escapeHtml(brandName(settings));
+  const initials = escapeHtml(brandInitials(brandName(settings)));
   const hotline = settings.hotline || settings.phone || '';
   const phoneHref = String(hotline).replace(/[^\d+]/g, '');
   const links = NAV_ITEMS.map((item) => {
@@ -192,7 +223,7 @@ function renderHeader(settings, active) {
   return `<header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="${pageUrl('/home/')}">
-        <span class="brand-mark">TV</span>
+        <span class="brand-mark">${initials}</span>
         <span>
           <strong>${name}</strong>
           <small>Thuê xe hợp đồng 4 - 45 chỗ</small>
@@ -209,7 +240,7 @@ function renderHeader(settings, active) {
 }
 
 function renderFooter(settings) {
-  const name = escapeHtml(settings.company_name || 'Xe Hợp Đồng Tháo Vy');
+  const name = escapeHtml(brandName(settings));
   const address = escapeHtml(settings.address || '');
   const phone = escapeHtml(settings.phone || '');
   const email = escapeHtml(settings.email || '');
@@ -234,20 +265,40 @@ function renderFooter(settings) {
         <a href="${pageUrl('/booking/')}">Đặt xe</a>
         <a href="${pageUrl('/booking/lookup/')}">Tra cứu đơn</a>
         <a href="${pageUrl('/reviews/')}">Gửi đánh giá</a>
-        <a href="${API_BASE}/admin/login">Quản trị</a>
+        <a href="${SITE_BASE}/admin/login">Quản trị</a>
       </div>
     </div>
     <div class="container footer-bottom">© ${new Date().getFullYear()} ${name}. All rights reserved.</div>
   </footer>`;
 }
 
-export async function initLayout(active = '') {
-  let settings = {};
-  try {
-    settings = await loadSettings();
-  } catch {
-    settings = {};
+function applyBrandTitle(settings) {
+  const brand = brandName(settings);
+  const previousSuffix = `— ${renderedBrand}`;
+  let base = document.title.trim();
+  if (renderedBrand !== '' && base.endsWith(previousSuffix)) {
+    base = base.slice(0, -previousSuffix.length).trim();
   }
+  if (base !== '' && !base.endsWith(`— ${brand}`)) {
+    document.title = `${base} — ${brand}`;
+  }
+  renderedBrand = brand;
+}
+
+function bindNavToggle() {
+  const toggle = document.querySelector('.nav-toggle');
+  const nav = document.querySelector('.site-nav');
+  if (!toggle || !nav) return;
+  toggle.addEventListener('click', () => {
+    const opened = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', opened ? 'true' : 'false');
+  });
+}
+
+function applySettings(settings, active) {
+  const previous = currentSettings;
+  currentSettings = settings;
+  applyBrandTitle(settings);
 
   const header = document.getElementById('site-header');
   if (header) header.innerHTML = renderHeader(settings, active);
@@ -255,14 +306,51 @@ export async function initLayout(active = '') {
   const footer = document.getElementById('site-footer');
   if (footer) footer.innerHTML = renderFooter(settings);
 
-  const toggle = document.querySelector('.nav-toggle');
-  const nav = document.querySelector('.site-nav');
-  if (toggle && nav) {
-    toggle.addEventListener('click', () => {
-      const opened = nav.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', opened ? 'true' : 'false');
+  bindNavToggle();
+
+  if (!sameJson(previous, settings)) {
+    settingsListeners.forEach((listener) => {
+      try {
+        listener(settings);
+      } catch {
+        // Một listener lỗi không được làm hỏng phần còn lại của trang.
+      }
     });
   }
+}
+
+async function refreshSettings() {
+  try {
+    const settings = await loadSettings(true);
+    if (!sameJson(settings, currentSettings)) {
+      applySettings(settings, layoutActive);
+    }
+  } catch {
+    // Mất mạng tạm thời: giữ cài đặt đang hiển thị và thử lại ở chu kỳ sau.
+  }
+}
+
+function watchSettings() {
+  if (settingsTimer !== null) return;
+  settingsTimer = window.setInterval(() => {
+    if (!document.hidden) refreshSettings();
+  }, 45000);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refreshSettings();
+  });
+}
+
+export async function initLayout(active = '') {
+  layoutActive = active;
+  let settings = {};
+  try {
+    settings = await loadSettings();
+  } catch {
+    settings = {};
+  }
+
+  applySettings(settings, active);
+  watchSettings();
 
   return settings;
 }

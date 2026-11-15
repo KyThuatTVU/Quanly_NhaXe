@@ -12,7 +12,7 @@
             <div class="form-grid">
                 <div class="form-field">
                     <label for="code">Mã đơn <span class="req">*</span></label>
-                    <input id="code" name="code" value="<?= e($code) ?>" required placeholder="VD: TV2611140001">
+                    <input id="code" name="code" value="<?= e($code) ?>" required placeholder="VD: DX2611140001">
                 </div>
                 <div class="form-field">
                     <label for="phone">Số điện thoại <span class="req">*</span></label>

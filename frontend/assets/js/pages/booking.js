@@ -1,5 +1,6 @@
 import { get, post } from '../api.js';
 import { initLayout, pageUrl, queryParam, money, escapeHtml, setAlert } from '../site.js';
+import { liveRefresh, sameJson } from '../live.js';
 
 const alertBox = document.getElementById('page-alert');
 const form = document.getElementById('booking-form');
@@ -27,26 +28,51 @@ function syncSeats() {
   vehicleHint.textContent = seats > 0 ? `Xe chở tối đa ${seats} hành khách.` : '';
 }
 
-try {
+const preselect = queryParam('vehicle_id');
+let lastOptions = '';
+
+function hasOption(select, value) {
+  return value !== '' && [...select.options].some((option) => option.value === value);
+}
+
+function renderOptions(vehicles, services) {
+  const currentVehicle = vehicleSelect.value || preselect;
+  const currentService = serviceSelect.value;
+
+  vehicleSelect.innerHTML = '<option value="">Chọn xe</option>' + vehicles
+    .map((vehicle) => `<option value="${vehicle.vehicle_id}" data-seats="${Number(vehicle.type_seats || 0)}">${escapeHtml(vehicle.name)} — ${escapeHtml(vehicle.type_name || vehicle.type || '')} — ${money(vehicle.price_per_day)}/ngày</option>`)
+    .join('');
+
+  serviceSelect.innerHTML = '<option value="">Không chọn dịch vụ</option>' + services
+    .map((service) => `<option value="${service.service_id}">${escapeHtml(service.service_name)} — từ ${money(service.price)}</option>`)
+    .join('');
+
+  if (hasOption(vehicleSelect, currentVehicle)) vehicleSelect.value = currentVehicle;
+  if (hasOption(serviceSelect, currentService)) serviceSelect.value = currentService;
+  syncSeats();
+}
+
+async function loadOptions() {
   const [vehiclesResponse, servicesResponse] = await Promise.all([
     get('/api/vehicles', { auth: false }),
     get('/api/services', { auth: false }),
   ]);
+  const model = {
+    vehicles: vehiclesResponse.data || [],
+    services: servicesResponse.data || [],
+  };
+  if (sameJson(model, lastOptions)) return;
+  lastOptions = model;
+  renderOptions(model.vehicles, model.services);
+}
 
-  const preselect = queryParam('vehicle_id');
-  const vehicles = vehiclesResponse.data || [];
-  vehicleSelect.innerHTML = '<option value="">Chọn xe</option>' + vehicles
-    .map((vehicle) => `<option value="${vehicle.vehicle_id}" data-seats="${Number(vehicle.type_seats || 0)}"${String(vehicle.vehicle_id) === preselect ? ' selected' : ''}>${escapeHtml(vehicle.name)} — ${escapeHtml(vehicle.type_name || vehicle.type || '')} — ${money(vehicle.price_per_day)}/ngày</option>`)
-    .join('');
-
-  serviceSelect.innerHTML = '<option value="">Không chọn dịch vụ</option>' + (servicesResponse.data || [])
-    .map((service) => `<option value="${service.service_id}">${escapeHtml(service.service_name)} — từ ${money(service.price)}</option>`)
-    .join('');
-
-  syncSeats();
+try {
+  await loadOptions();
 } catch (error) {
   setAlert(alertBox, error.message || 'Không tải được danh sách xe/dịch vụ.');
 }
+
+liveRefresh(loadOptions, { interval: 30, immediate: false });
 
 vehicleSelect.addEventListener('change', syncSeats);
 

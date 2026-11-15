@@ -1,0 +1,45 @@
+# Cấu hình Apache cho thư mục gốc dự án
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # URL cũ /frontend/pages/<trang>/ do front controller chuyển hướng về URL sạch
+    RewriteRule ^frontend/pages(?:/|$) index.php [L,QSA]
+
+    # URL cũ /backend/public/... do front controller chuyển hướng 301 về URL sạch
+    RewriteRule ^backend/public(?:/|$) index.php [L,QSA]
+
+    # Chặn truy cập trực tiếp vào mã nguồn frontend
+    RewriteCond %{THE_REQUEST} \s/+(?:.*/)?frontend(?:/|\s) [NC]
+    RewriteCond %{THE_REQUEST} !\s/+(?:.*/)?frontend/pages(?:/|\s) [NC]
+    RewriteRule ^ - [F,L]
+
+    # Chặn mã nguồn nội bộ backend (chỉ mở /backend/public cho API)
+    RewriteCond %{THE_REQUEST} \s/+(?:.*/)?backend/(?:app|bootstrap|config|routes|storage)(?:/|\s) [NC]
+    RewriteRule ^ - [F,L]
+
+    # Chặn thư mục ẩn (.git, ...)
+    RewriteCond %{THE_REQUEST} \s/+(?:.*/)?\.(?:git|idea|vscode)(?:/|\s) [NC]
+    RewriteRule ^ - [F,L]
+
+    # Tài nguyên tĩnh: /assets/... -> frontend/assets/...
+    RewriteRule ^assets/(.*)$ frontend/assets/$1 [L]
+
+    # Mọi đường dẫn còn lại đi qua front controller
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+<FilesMatch "(?i)(^\.env|\.(sql|md|docx?|log|ini|bak|sh)$)">
+    Require all denied
+</FilesMatch>
+
+# JS/CSS phải revalidate để bản cập nhật có hiệu lực ngay, không bị cache cũ
+<IfModule mod_headers.c>
+    <FilesMatch "\.(?:js|css)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+</IfModule>

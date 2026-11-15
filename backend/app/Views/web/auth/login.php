@@ -1,6 +1,6 @@
 <div class="auth-card">
     <a class="auth-brand" href="<?= url('/') ?>">
-        <span class="brand-mark">TV</span>
+        <span class="brand-mark"><?= e(brand_initials((string) ($site['name'] ?? ''))) ?></span>
         <span><?= e($site['name'] ?? 'Quản trị') ?></span>
     </a>
     <h1>Đăng nhập quản trị</h1>

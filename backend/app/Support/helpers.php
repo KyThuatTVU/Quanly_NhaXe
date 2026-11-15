@@ -11,12 +11,27 @@ function e(mixed $value): string
     return htmlspecialchars((string) ($value ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+function base_url(): string
+{
+    $host = (string) ($_SERVER['HTTP_HOST'] ?? '');
+    if ($host !== '' && preg_match('/^[A-Za-z0-9.\-]+(?::\d+)?$/', $host) === 1) {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+        $dir = rtrim(str_replace('\\', '/', dirname($script)), '/');
+        if ($dir === '.' || $dir === '/') {
+            $dir = '';
+        }
+        return $scheme . '://' . $host . $dir;
+    }
+    return rtrim((string) Config::get('app.url', ''), '/');
+}
+
 function url(string $path = ''): string
 {
     if (preg_match('#^https?://#i', $path) === 1) {
         return $path;
     }
-    $base = rtrim((string) Config::get('app.url', ''), '/');
+    $base = rtrim(base_url(), '/');
     $path = trim($path, '/');
     return $path === '' ? $base . '/' : $base . '/' . $path;
 }
@@ -29,6 +44,25 @@ function asset(string $path): string
 function media(string $path): string
 {
     return url(ltrim($path, '/'));
+}
+
+function brand_initials(?string $name, string $fallback = 'NX'): string
+{
+    $name = trim((string) $name);
+    if ($name === '') {
+        return $fallback;
+    }
+    $initials = '';
+    foreach (preg_split('/\s+/u', $name) ?: [] as $word) {
+        if ($word === '') {
+            continue;
+        }
+        $initials .= mb_substr($word, 0, 1);
+        if (mb_strlen($initials) >= 2) {
+            break;
+        }
+    }
+    return mb_strtoupper($initials !== '' ? $initials : mb_substr($name, 0, 2));
 }
 
 function csrf_field(): string

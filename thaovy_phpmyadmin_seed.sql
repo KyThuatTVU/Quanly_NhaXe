@@ -1,5 +1,5 @@
 -- =====================================================================
--- DỰ ÁN     : Xe Hợp Đồng Tháo Vy
+-- DỰ ÁN     : Website thuê xe hợp đồng
 -- FILE      : thaovy_phpmyadmin_seed.sql
 -- MÔ TẢ     : Dữ liệu mẫu để chạy thử (import SAU khi đã import schema)
 -- NGÀY TẠO  : 2026-11-14
@@ -37,7 +37,7 @@ INSERT INTO `settings`
     (`id`, `company_name`, `address`, `phone`, `hotline`, `zalo`, `facebook`,
      `email`, `working_hours`, `map_location`, `description`)
 VALUES
-    (1, 'Xe Hợp Đồng Tháo Vy',
+    (1, 'Nhà xe',
      'Số 1 Đường Trần Phú, Quận Hà Đông, TP. Hà Nội',
      '0987 654 321', '1900 1234', '0987654321',
      'https://facebook.com/xehopdongthaovy',
@@ -286,7 +286,7 @@ VALUES
      '<p>Chỉ cần một ngày, bạn có thể đi Tràng An, Bái Đính, Hạ Long, Tam Đảo hoặc Bát Tràng. Thuê xe theo ngày giúp chủ động thời gian và không phải đổi phương tiện.</p><p>Gợi ý lịch trình: khởi hành 7:00, đến nơi 9:30, ăn trưa tại địa phương và về Hà Nội trước 19:00.</p>',
      NULL, 'Du lịch', 'published', 1, '2026-11-08 14:30:00'),
 
-    (3, 'Quy trình đặt xe hợp đồng tại Tháo Vy',
+    (3, 'Quy trình đặt xe hợp đồng',
      'quy-trinh-dat-xe-hop-dong',
      '<p>Bước 1: Gửi yêu cầu qua form đặt xe hoặc hotline. Bước 2: Nhân viên tư vấn loại xe và báo giá trong 15 phút. Bước 3: Xác nhận đơn và nhận mã đơn. Bước 4: Tài xế liên hệ trước giờ đón 1 tiếng.</p>',
      NULL, 'Tin công ty', 'published', 1, '2026-11-01 08:15:00');

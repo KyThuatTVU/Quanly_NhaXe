@@ -1,9 +1,13 @@
+<?php
+$brandName = trim((string) ($site['name'] ?? '')) ?: 'Nhà xe';
+$brandInitials = brand_initials($brandName);
+?>
 <header class="site-header">
     <div class="container header-inner">
         <a class="brand" href="<?= url('/') ?>">
-            <span class="brand-mark">TV</span>
+            <span class="brand-mark"><?= e($brandInitials) ?></span>
             <span class="brand-text">
-                <strong><?= e($site['name'] ?? 'Xe Hợp Đồng Tháo Vy') ?></strong>
+                <strong><?= e($brandName) ?></strong>
                 <small>Thuê xe hợp đồng 4 - 45 chỗ</small>
             </span>
         </a>

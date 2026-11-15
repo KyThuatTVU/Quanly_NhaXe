@@ -53,6 +53,6 @@ final class ReviewController extends AdminController
         $id = $this->intParam($id);
         $this->reviews->delete($id, $request);
         Flash::put('success', 'Đã xóa đánh giá #' . $id);
-        return $this->back($request, '/admin/reviews');
+        return $this->redirect('/admin/reviews');
     }
 }

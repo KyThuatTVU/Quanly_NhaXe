@@ -11,7 +11,7 @@
                 <?php if (!empty($car['image'])): ?>
                     <img src="<?= e(media((string) $car['image'])) ?>" alt="<?= e($car['name']) ?>">
                 <?php else: ?>
-                    <span class="media-placeholder large">TV</span>
+                    <span class="media-placeholder large"><?= e(brand_initials((string) ($site['name'] ?? ''))) ?></span>
                 <?php endif; ?>
             </div>
             <div class="detail-info">

@@ -31,7 +31,7 @@
 
         <div class="grid grid-3">
             <?php foreach ($cars as $car): ?>
-                <?php $view->partial('partials/car-card', ['car' => $car]); ?>
+                <?php $view->partial('partials/car-card', ['car' => $car, 'site' => $site]); ?>
             <?php endforeach; ?>
         </div>
         <?php if ($cars === []): ?>

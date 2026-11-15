@@ -4,7 +4,7 @@
         <?php if (!empty($car['image'])): ?>
             <img src="<?= e(media((string) $car['image'])) ?>" alt="<?= e($car['name']) ?>" loading="lazy">
         <?php else: ?>
-            <span class="media-placeholder">TV</span>
+            <span class="media-placeholder"><?= e(brand_initials((string) ($site['name'] ?? ''))) ?></span>
         <?php endif; ?>
         <span class="<?= e(\App\Support\Format::badge((string) $car['status'])) ?> card-badge">
             <?= e(\App\Support\Format::carStatus((string) $car['status'])) ?>

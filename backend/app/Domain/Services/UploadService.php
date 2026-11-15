@@ -57,7 +57,7 @@ final class UploadService
         $path = 'uploads/' . $folder . '/' . $filename;
         return [
             'path' => $path,
-            'url' => rtrim((string) Config::get('app.url', ''), '/') . '/' . $path,
+            'url' => url($path),
             'mime' => $mime,
             'size' => $size,
         ];

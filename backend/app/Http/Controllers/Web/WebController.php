@@ -55,7 +55,7 @@ abstract class WebController
     protected function back(Request $request, string $fallback = '/'): Response
     {
         $referer = (string) $request->header('referer', '');
-        if ($referer !== '' && str_starts_with($referer, (string) Config::get('app.url', ''))) {
+        if ($referer !== '' && str_starts_with($referer, base_url())) {
             return Response::redirect($referer);
         }
         return $this->redirect($fallback);
@@ -85,7 +85,8 @@ abstract class WebController
     {
         if ($this->siteCache === null) {
             $site = $this->settings->get();
-            $site['name'] = (string) Config::get('app.name', 'Xe Hợp Đồng Tháo Vy');
+            $name = trim((string) ($site['company_name'] ?? ''));
+            $site['name'] = $name !== '' ? $name : (string) Config::get('app.name', 'Nhà xe');
             $this->siteCache = $site;
         }
         return $this->siteCache;

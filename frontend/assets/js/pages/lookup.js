@@ -8,6 +8,7 @@ import {
   statusBadge,
   setAlert,
 } from '../site.js';
+import { liveRefresh, sameJson } from '../live.js';
 
 const alertBox = document.getElementById('page-alert');
 const form = document.getElementById('lookup-form');
@@ -16,7 +17,14 @@ const submitButton = document.getElementById('lookup-btn');
 
 await initLayout('lookup');
 
+let activeQuery = null;
+let lastBooking = '';
+let poller = null;
+
 function renderBooking(booking) {
+  if (sameJson(booking, lastBooking)) return;
+  lastBooking = booking;
+
   const rows = [
     ['Khách hàng', booking.customer_name],
     ['Số điện thoại', booking.customer_phone],
@@ -41,7 +49,21 @@ function renderBooking(booking) {
         .map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(String(value))}</dd></div>`)
         .join('')}
     </dl>
+    <p class="muted small">Trạng thái đơn tự động cập nhật, bạn không cần tải lại trang.</p>
   </div>`;
+}
+
+async function fetchBooking(query) {
+  const response = await get('/api/bookings/lookup', { auth: false, query });
+  return response.data;
+}
+
+function startPoller() {
+  if (poller !== null) return;
+  poller = liveRefresh(async () => {
+    if (!activeQuery) return;
+    renderBooking(await fetchBooking(activeQuery));
+  }, { interval: 15, immediate: false });
 }
 
 form.addEventListener('submit', async (event) => {
@@ -61,11 +83,10 @@ form.addEventListener('submit', async (event) => {
   }
 
   try {
-    const response = await get('/api/bookings/lookup', {
-      auth: false,
-      query: { code, phone },
-    });
-    renderBooking(response.data);
+    activeQuery = { code, phone };
+    lastBooking = '';
+    renderBooking(await fetchBooking(activeQuery));
+    startPoller();
   } catch (error) {
     setAlert(alertBox, typeof error.firstError === 'function' ? error.firstError() : error.message);
   } finally {

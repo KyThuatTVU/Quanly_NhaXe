@@ -6,16 +6,25 @@
 const DEFAULT_API_BASE = 'http://127.0.0.1/DuAn_QuanLyNhaXe/backend/public';
 const AUTH_STORAGE_KEY = 'thaovy.auth';
 const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS'];
+const ROUTE_ROOTS = ['home', 'about', 'cars', 'services', 'posts', 'booking', 'contact', 'reviews'];
+
+/** Thư mục gốc website, ví dụ '' hoặc '/DuAn_QuanLyNhaXe'. */
+export function siteBase() {
+  if (typeof window === 'undefined') return '';
+  const path = window.location.pathname;
+  const legacy = path.indexOf('/frontend/');
+  if (legacy >= 0) return path.slice(0, legacy);
+  const segments = path.split('/').filter(Boolean);
+  const index = segments.findIndex((segment) => ROUTE_ROOTS.includes(segment));
+  return index > 0 ? `/${segments.slice(0, index).join('/')}` : '';
+}
 
 function resolveApiBase() {
   if (typeof window !== 'undefined' && typeof window.API_BASE_URL === 'string' && window.API_BASE_URL.trim() !== '') {
     return window.API_BASE_URL.trim().replace(/\/+$/, '');
   }
   if (typeof window !== 'undefined' && /^https?:$/.test(window.location.protocol)) {
-    const marker = window.location.pathname.indexOf('/frontend/');
-    if (marker >= 0) {
-      return window.location.origin + window.location.pathname.slice(0, marker) + '/backend/public';
-    }
+    return window.location.origin + siteBase();
   }
   return DEFAULT_API_BASE;
 }
@@ -237,5 +246,5 @@ export function assetUrl(path) {
   if (/^https?:\/\//i.test(path) || path.startsWith('//') || path.startsWith('data:')) {
     return path;
   }
-  return `${API_BASE}/${String(path).replace(/^\/+/, '')}`;
+  return `${siteBase()}/${String(path).replace(/^\/+/, '')}`;
 }

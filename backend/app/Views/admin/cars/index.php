@@ -47,7 +47,7 @@
                                 <?php if (!empty($car['image'])): ?>
                                     <img src="<?= e(media((string) $car['image'])) ?>" alt="" width="56" height="40">
                                 <?php else: ?>
-                                    <span class="table-media-ph">TV</span>
+                                    <span class="table-media-ph"><?= e(brand_initials((string) ($site['name'] ?? ''))) ?></span>
                                 <?php endif; ?>
                                 <strong><?= e($car['name']) ?></strong>
                             </div>

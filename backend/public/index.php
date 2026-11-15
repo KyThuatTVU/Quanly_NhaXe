@@ -11,6 +11,28 @@ use App\Core\View;
 use App\Domain\Exceptions\BusinessRuleException;
 use App\Support\Flash;
 
+// Truy cập qua URL cũ /backend/public/...: chuyển hẳn (301) sang URL sạch
+$scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+$legacySuffix = '/backend/public/index.php';
+if (str_ends_with($scriptName, $legacySuffix)) {
+    $projectBase = substr($scriptName, 0, -strlen($legacySuffix));
+    $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $legacyPrefix = $projectBase . '/backend/public';
+    if (str_starts_with($uri, $legacyPrefix)) {
+        $legacyRoute = trim(rawurldecode('backend/public' . substr($uri, strlen($legacyPrefix))), '/');
+        require_once dirname(__DIR__) . '/bootstrap/legacy-redirect.php';
+        $legacyTarget = legacy_backend_target($legacyRoute) ?? 'home/';
+
+        $query = (string) ($_SERVER['QUERY_STRING'] ?? '');
+        if ($query !== '') {
+            $legacyTarget .= (str_contains($legacyTarget, '?') ? '&' : '?') . $query;
+        }
+
+        header('Location: ' . $projectBase . '/' . $legacyTarget, true, 301);
+        exit;
+    }
+}
+
 /** @var \App\Core\Router $router */
 $router = require dirname(__DIR__) . '/bootstrap/app.php';
 
@@ -20,7 +42,7 @@ $isWeb = !str_starts_with($path, '/api') && !str_starts_with($path, '/uploads') 
 
 $redirectBack = static function (Request $request) use ($path): Response {
     $referer = (string) $request->header('referer', '');
-    if ($referer !== '' && str_starts_with($referer, (string) Config::get('app.url', ''))) {
+    if ($referer !== '' && str_starts_with($referer, base_url())) {
         return Response::redirect($referer);
     }
     return Response::redirect(url(str_starts_with($path, '/admin') ? '/admin' : '/'));
@@ -35,7 +57,7 @@ $errorPage = static function (int $status, string $message) {
     return View::renderResponse($view, [
         'status' => $status,
         'message' => $message,
-        'site' => ['name' => (string) Config::get('app.name', 'Xe Hợp Đồng Tháo Vy')],
+        'site' => ['name' => (string) Config::get('app.name', 'Nhà xe')],
     ], null)->withStatus($status);
 };
 

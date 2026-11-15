@@ -1,5 +1,5 @@
 import { post } from '../api.js';
-import { initLayout, escapeHtml, setAlert } from '../site.js';
+import { initLayout, onSettingsChange, escapeHtml, setAlert } from '../site.js';
 
 const alertBox = document.getElementById('page-alert');
 const form = document.getElementById('contact-form');
@@ -7,19 +7,24 @@ const submitButton = document.getElementById('contact-btn');
 
 const settings = await initLayout('contact');
 
-const infoRows = [
-  ['Công ty', settings.company_name || ''],
-  ['Địa chỉ', settings.address || ''],
-  ['Điện thoại', settings.phone || ''],
-  ['Hotline', settings.hotline || ''],
-  ['Email', settings.email || ''],
-  ['Giờ làm việc', settings.working_hours || ''],
-];
+function applySettings(current) {
+  const infoRows = [
+    ['Công ty', current.company_name || ''],
+    ['Địa chỉ', current.address || ''],
+    ['Điện thoại', current.phone || ''],
+    ['Hotline', current.hotline || ''],
+    ['Email', current.email || ''],
+    ['Giờ làm việc', current.working_hours || ''],
+  ];
 
-document.getElementById('contact-info').innerHTML = infoRows
-  .filter(([, value]) => value !== '')
-  .map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`)
-  .join('');
+  document.getElementById('contact-info').innerHTML = infoRows
+    .filter(([, value]) => value !== '')
+    .map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`)
+    .join('');
+}
+
+applySettings(settings);
+onSettingsChange(applySettings);
 
 function clearFieldErrors() {
   form.querySelectorAll('[data-error]').forEach((element) => {

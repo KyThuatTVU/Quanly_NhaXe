@@ -1,5 +1,5 @@
 -- =====================================================================
--- DỰ ÁN     : Xe Hợp Đồng Tháo Vy
+-- DỰ ÁN     : Website thuê xe hợp đồng
 -- FILE      : thaovy_phpmyadmin_schema.sql
 -- MÔ TẢ     : CSDL chuẩn hóa - CHỈ CẤU TRÚC, KHÔNG KÈM DỮ LIỆU
 -- NGÀY SỬA  : 2026-11-14 (bản 2)
@@ -211,7 +211,7 @@ CREATE TABLE IF NOT EXISTS `services` (
 -- =====================================================================
 CREATE TABLE IF NOT EXISTS `bookings` (
     `booking_id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `booking_code`         VARCHAR(20)  NOT NULL COMMENT 'Mã đơn hiển thị, ví dụ TV2611140001',
+    `booking_code`         VARCHAR(20)  NOT NULL COMMENT 'Mã đơn hiển thị, ví dụ DX2611140001',
     `customer_id`          INT UNSIGNED DEFAULT NULL,
     `vehicle_id`           INT UNSIGNED DEFAULT NULL,
     `service_id`           INT UNSIGNED DEFAULT NULL,
