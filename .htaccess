@@ -17,7 +17,7 @@ DirectoryIndex index.php
     RewriteRule ^ - [F,L]
 
     # Chặn mã nguồn nội bộ backend (chỉ mở /backend/public cho API)
-    RewriteCond %{THE_REQUEST} \s/+(?:.*/)?backend/(?:app|bootstrap|config|routes|storage)(?:/|\s) [NC]
+    RewriteCond %{THE_REQUEST} \s/+(?:.*/)?backend/(?:app|bin|bootstrap|config|routes|storage|tests)(?:/|\s) [NC]
     RewriteRule ^ - [F,L]
 
     # Chặn thư mục ẩn (.git, ...)

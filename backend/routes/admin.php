@@ -17,12 +17,13 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Middleware\CsrfMiddleware;
+use App\Http\Middleware\RateLimitMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\WebAuthMiddleware;
 
 return static function (Router $router): void {
     $router->get('/admin/login', [AuthController::class, 'showLogin']);
-    $router->post('/admin/login', [AuthController::class, 'login'], [CsrfMiddleware::class]);
+    $router->post('/admin/login', [AuthController::class, 'login'], [[RateLimitMiddleware::class, ['login', 5, 60]], CsrfMiddleware::class]);
     $router->post('/admin/logout', [AuthController::class, 'logout'], [WebAuthMiddleware::class]);
 
     $router->group(

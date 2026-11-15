@@ -31,6 +31,34 @@ final class PdoBookingRepository extends Repository
         );
     }
 
+    /**
+     * Khóa dòng xe rồi mới kiểm tra trùng lịch + ghi đơn, tránh 2 khách đặt cùng lúc.
+     * $guard ném ngoại lệ nếu khoảng ngày bị trùng; trả null khi xe không tồn tại.
+     */
+    public function createLocked(array $data, callable $guard): ?int
+    {
+        $this->pdo->beginTransaction();
+        try {
+            $lock = $this->pdo->prepare('SELECT vehicle_id FROM vehicles WHERE vehicle_id = :id FOR UPDATE');
+            $lock->execute(['id' => (int) ($data['vehicle_id'] ?? 0)]);
+            if ($lock->fetchColumn() === false) {
+                $this->pdo->rollBack();
+                return null;
+            }
+
+            $guard();
+
+            $id = $this->create($data);
+            $this->pdo->commit();
+            return $id;
+        } catch (\Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $exception;
+        }
+    }
+
     public function find(int $id): ?array
     {
         return $this->fetchOne(self::SELECT . ' WHERE b.booking_id = :id', ['id' => $id]);

@@ -142,12 +142,8 @@ final class BookingService
         }
 
         $effectiveReturn = $returnDate ?? $pickupDate;
-        if ($this->bookings->hasConflict($vehicleId, $pickupDate, $effectiveReturn)) {
-            throw new CarScheduleConflictException();
-        }
 
-        $lockDate = $returnDate ?? $pickupDate;
-        $days = max(1, (int) ((strtotime($lockDate) - strtotime($pickupDate)) / 86400) + 1);
+        $days = max(1, (int) ((strtotime($effectiveReturn) - strtotime($pickupDate)) / 86400) + 1);
         $pricePerDay = $vehicle['price_per_day'] !== null ? (float) $vehicle['price_per_day'] : null;
         $pricePerKm = $vehicle['price_per_km'] !== null ? (float) $vehicle['price_per_km'] : null;
         $totalAmount = $pricePerDay !== null ? round($pricePerDay * $days, 2) : null;
@@ -179,7 +175,15 @@ final class BookingService
             'notes' => $data['notes'],
         ];
 
-        $id = $this->bookings->create($payload);
+        $id = $this->bookings->createLocked($payload, function () use ($vehicleId, $pickupDate, $effectiveReturn): void {
+            if ($this->bookings->hasConflict($vehicleId, $pickupDate, $effectiveReturn)) {
+                throw new CarScheduleConflictException();
+            }
+        });
+        if ($id === null) {
+            throw new NotFoundException('Không tìm thấy xe');
+        }
+
         $request->setAttribute('booking_code', $payload['booking_code']);
         $this->audit->log(
             $request,

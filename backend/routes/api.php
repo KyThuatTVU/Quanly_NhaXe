@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\StatisticController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\CsrfMiddleware;
+use App\Http\Middleware\RateLimitMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 
 return static function (Router $router): void {
@@ -28,7 +29,7 @@ return static function (Router $router): void {
     // ------------------------------------------------------------------
     $router->get('/api/health', [HealthController::class, 'index']);
     $router->get('/api/auth/csrf', [AuthController::class, 'csrf']);
-    $router->post('/api/auth/login', [AuthController::class, 'login'], [CsrfMiddleware::class]);
+    $router->post('/api/auth/login', [AuthController::class, 'login'], [[RateLimitMiddleware::class, ['login', 5, 60]], CsrfMiddleware::class]);
 
     $router->get('/api/settings', [SettingController::class, 'show']);
 
@@ -48,11 +49,11 @@ return static function (Router $router): void {
     $router->get('/api/posts/{slug}', [PostController::class, 'show']);
 
     $router->get('/api/bookings/availability', [BookingController::class, 'checkAvailability']);
-    $router->get('/api/bookings/lookup', [BookingController::class, 'lookup']);
-    $router->post('/api/bookings', [BookingController::class, 'store'], [CsrfMiddleware::class]);
+    $router->get('/api/bookings/lookup', [BookingController::class, 'lookup'], [[RateLimitMiddleware::class, ['lookup', 15, 60]]]);
+    $router->post('/api/bookings', [BookingController::class, 'store'], [[RateLimitMiddleware::class, ['booking', 5, 600]], CsrfMiddleware::class]);
 
-    $router->post('/api/contacts', [ContactController::class, 'store'], [CsrfMiddleware::class]);
-    $router->post('/api/reviews', [ReviewController::class, 'store'], [CsrfMiddleware::class]);
+    $router->post('/api/contacts', [ContactController::class, 'store'], [[RateLimitMiddleware::class, ['contact', 3, 300]], CsrfMiddleware::class]);
+    $router->post('/api/reviews', [ReviewController::class, 'store'], [[RateLimitMiddleware::class, ['review', 3, 600]], CsrfMiddleware::class]);
 
     $router->get('/uploads/{folder}/{filename}', [MediaController::class, 'show']);
 

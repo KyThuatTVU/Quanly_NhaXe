@@ -65,4 +65,21 @@ final class Config
         }
         return $value;
     }
+
+    /**
+     * Ghi đè cấu hình lúc chạy (dùng cho test trỏ sang database riêng).
+     */
+    public static function set(string $key, mixed $value): void
+    {
+        $segments = explode('.', $key);
+        $reference = &self::$items;
+        while (count($segments) > 1) {
+            $segment = array_shift($segments);
+            if (!isset($reference[$segment]) || !is_array($reference[$segment])) {
+                $reference[$segment] = [];
+            }
+            $reference = &$reference[$segment];
+        }
+        $reference[$segments[0]] = $value;
+    }
 }

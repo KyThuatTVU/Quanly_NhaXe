@@ -2,7 +2,7 @@
 -- DỰ ÁN     : Website thuê xe hợp đồng
 -- FILE      : thaovy_phpmyadmin_schema.sql
 -- MÔ TẢ     : CSDL chuẩn hóa - CHỈ CẤU TRÚC, KHÔNG KÈM DỮ LIỆU
--- NGÀY SỬA  : 2026-11-14 (bản 2)
+-- NGÀY SỬA  : 2026-11-15 (bản 3)
 -- MySQL     : 8.0.16+ / MariaDB 10.4+ (CHECK và DEFAULT biểu thức được thực thi)
 -- CHARSET   : utf8mb4 / utf8mb4_unicode_ci
 --
@@ -21,6 +21,8 @@
 --   7. services.slug và posts.slug: NOT NULL + UNIQUE (nhất quán với vehicle_types).
 --   8. vehicle_types: thêm seats_min/seats_max cho loại "35-45 chỗ".
 --   9. Index tổ hợp idx_bookings_vehicle_time cho truy vấn trùng lịch xe.
+--  10. Thêm bảng rate_limits cho RateLimitMiddleware (chống spam form/login);
+--      database cũ chỉ cần chạy php backend/bin/migrate.php là đủ.
 --
 -- LƯU Ý:
 --   - Chỉ dùng CREATE ... IF NOT EXISTS, KHÔNG DROP, KHÔNG INSERT.
@@ -377,5 +379,19 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================================
--- KẾT THÚC SCHEMA - 12 BẢNG, CHƯA CÓ DỮ LIỆU
+-- 13. RATE_LIMITS - Bộ đếm giới hạn tần suất (fixed window)
+--     bucket_key = hash(scope|IP); middleware tự dọn dòng hết hạn.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `rate_limits` (
+    `bucket_key` VARCHAR(64)  CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    `scope`      VARCHAR(50)  CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL,
+    `hits`       INT UNSIGNED NOT NULL DEFAULT 0,
+    `reset_at`   DATETIME     NOT NULL,
+    `updated_at` TIMESTAMP    NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`bucket_key`),
+    KEY `idx_rate_limits_reset` (`reset_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- KẾT THÚC SCHEMA - 13 BẢNG, CHƯA CÓ DỮ LIỆU
 -- =====================================================================

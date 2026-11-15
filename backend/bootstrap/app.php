@@ -7,17 +7,7 @@ use App\Core\Router;
 
 $basePath = dirname(__DIR__);
 
-spl_autoload_register(static function (string $class) use ($basePath): void {
-    $prefix = 'App\\';
-    if (!str_starts_with($class, $prefix)) {
-        return;
-    }
-    $relative = str_replace('\\', '/', substr($class, strlen($prefix)));
-    $file = $basePath . '/app/' . $relative . '.php';
-    if (is_file($file)) {
-        require $file;
-    }
-});
+require $basePath . '/bootstrap/autoload.php';
 
 Config::bootstrap($basePath);
 
