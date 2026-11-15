@@ -21,10 +21,14 @@ spl_autoload_register(static function (string $class) use ($basePath): void {
 
 Config::bootstrap($basePath);
 
+require $basePath . '/app/Support/helpers.php';
+
 error_reporting(E_ALL);
 ini_set('display_errors', '0');
 
 $router = new Router();
+(require $basePath . '/routes/web.php')($router);
+(require $basePath . '/routes/admin.php')($router);
 (require $basePath . '/routes/api.php')($router);
 
 return $router;

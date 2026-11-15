@@ -4,21 +4,67 @@ declare(strict_types=1);
 
 use App\Core\Config;
 use App\Core\Exceptions\HttpException;
+use App\Core\Exceptions\ValidationException;
 use App\Core\Request;
 use App\Core\Response;
+use App\Core\View;
 use App\Domain\Exceptions\BusinessRuleException;
+use App\Support\Flash;
 
 /** @var \App\Core\Router $router */
 $router = require dirname(__DIR__) . '/bootstrap/app.php';
 
 $request = Request::capture();
+$path = $request->path();
+$isWeb = !str_starts_with($path, '/api') && !str_starts_with($path, '/uploads') && !str_starts_with($path, '/assets');
+
+$redirectBack = static function (Request $request) use ($path): Response {
+    $referer = (string) $request->header('referer', '');
+    if ($referer !== '' && str_starts_with($referer, (string) Config::get('app.url', ''))) {
+        return Response::redirect($referer);
+    }
+    return Response::redirect(url(str_starts_with($path, '/admin') ? '/admin' : '/'));
+};
+
+$errorPage = static function (int $status, string $message) {
+    $view = match ($status) {
+        403 => 'errors/403',
+        404 => 'errors/404',
+        default => 'errors/500',
+    };
+    return View::renderResponse($view, [
+        'status' => $status,
+        'message' => $message,
+        'site' => ['name' => (string) Config::get('app.name', 'Xe Hợp Đồng Tháo Vy')],
+    ], null)->withStatus($status);
+};
 
 try {
     $response = $router->dispatch($request);
-} catch (HttpException $exception) {
-    $response = Response::fail($exception->getMessage(), $exception->statusCode(), $exception->errors());
+} catch (ValidationException $exception) {
+    if ($isWeb) {
+        Flash::put('errors', $exception->errors());
+        Flash::put('old', $request->all());
+        $response = $redirectBack($request);
+    } else {
+        $response = Response::fail($exception->getMessage(), 422, $exception->errors());
+    }
 } catch (BusinessRuleException $exception) {
-    $response = Response::fail($exception->getMessage(), 409);
+    if ($isWeb) {
+        Flash::put('error', $exception->getMessage());
+        Flash::put('old', $request->all());
+        $response = $redirectBack($request);
+    } else {
+        $response = Response::fail($exception->getMessage(), 409);
+    }
+} catch (HttpException $exception) {
+    if ($isWeb && $exception->statusCode() === 401) {
+        $response = Response::redirect(url('/admin/login'));
+    } elseif ($isWeb) {
+        $response = $errorPage($exception->statusCode(), $exception->getMessage());
+    } else {
+        $response = Response::fail($exception->getMessage(), $exception->statusCode(), $exception->errors());
+    }
 } catch (Throwable $exception) {
     $logDir = dirname(__DIR__) . '/storage/logs';
     if (!is_dir($logDir)) {
@@ -42,7 +88,7 @@ try {
     $message = (bool) Config::get('app.debug', false)
         ? $exception->getMessage() . ' (' . basename($exception->getFile()) . ':' . $exception->getLine() . ')'
         : 'Đã xảy ra lỗi hệ thống, vui lòng thử lại sau';
-    $response = Response::fail($message, 500);
+    $response = $isWeb ? $errorPage(500, $message) : Response::fail($message, 500);
 }
 
 $response

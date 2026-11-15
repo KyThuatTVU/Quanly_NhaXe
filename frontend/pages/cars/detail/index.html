@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chi tiết xe — Xe Hợp Đồng Tháo Vy</title>
+    <link rel="stylesheet" href="../../../assets/css/app.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="site-main">
+    <section class="section">
+        <div class="container">
+            <p><a href="../">← Danh sách xe</a></p>
+            <div id="page-alert" class="alert-slot"></div>
+
+            <div class="detail-grid" id="vehicle-detail">
+                <div>
+                    <div class="info-card">
+                        <div id="vehicle-media"></div>
+                        <h1 id="vehicle-name" style="margin-top:16px">Đang tải...</h1>
+                        <p class="muted" id="vehicle-description"></p>
+                        <dl class="info-list" id="vehicle-specs" style="margin-top:18px"></dl>
+                    </div>
+
+                    <div class="info-card" style="margin-top:20px">
+                        <h2>Đánh giá khách hàng</h2>
+                        <div id="review-list"></div>
+                    </div>
+                </div>
+
+                <aside class="info-card">
+                    <p class="price" id="vehicle-price" style="font-size:1.2rem"></p>
+                    <p class="muted" id="vehicle-km"></p>
+                    <a class="btn btn-primary btn-block" id="book-link" href="../../booking/">Đặt xe này</a>
+                    <a class="btn btn-outline btn-block" style="margin-top:10px" href="../../booking/lookup/">Đã có đơn? Tra cứu</a>
+                </aside>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="site-footer"></div>
+<script type="module" src="../../../assets/js/pages/car-detail.js"></script>
+</body>
+</html>

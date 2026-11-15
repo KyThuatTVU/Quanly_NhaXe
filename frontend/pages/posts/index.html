@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bài viết — Xe Hợp Đồng Tháo Vy</title>
+    <link rel="stylesheet" href="../../assets/css/app.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="site-main">
+    <section class="section">
+        <div class="container">
+            <h1>Bài viết</h1>
+            <p class="muted">Kinh nghiệm thuê xe, điểm đến và thông tin từ Tháo Vy.</p>
+
+            <form class="form-card" id="filter-form" style="margin:18px 0">
+                <div class="form-grid">
+                    <label class="field">
+                        <span>Danh mục</span>
+                        <select name="category" id="category-filter">
+                            <option value="">Tất cả danh mục</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span>Tìm kiếm</span>
+                        <input type="search" name="search" id="search-input" placeholder="Tiêu đề bài viết...">
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">Lọc bài viết</button>
+                    <a class="btn btn-outline" href="./">Xoá lọc</a>
+                </div>
+            </form>
+
+            <div id="page-alert" class="alert-slot"></div>
+            <div class="grid grid-3" id="post-grid" style="margin-top:16px"></div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </section>
+</main>
+
+<div id="site-footer"></div>
+<script type="module" src="../../assets/js/pages/posts.js"></script>
+</body>
+</html>

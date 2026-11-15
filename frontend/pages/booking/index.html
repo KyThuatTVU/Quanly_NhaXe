@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Đặt xe — Xe Hợp Đồng Tháo Vy</title>
+    <link rel="stylesheet" href="../../assets/css/app.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="site-main">
+    <section class="section">
+        <div class="container">
+            <h1>Đặt xe</h1>
+            <p class="muted">Điền thông tin chuyến đi, nhân viên sẽ liên hệ xác nhận và báo giá trong 15 phút.</p>
+            <div id="page-alert" class="alert-slot"></div>
+
+            <form class="form-card" id="booking-form" style="margin-top:18px" novalidate>
+                <h2>Thông tin chuyến đi</h2>
+                <div class="form-grid">
+                    <label class="field">
+                        <span>Chọn xe *</span>
+                        <select name="vehicle_id" id="vehicle-select" required>
+                            <option value="">Đang tải danh sách xe...</option>
+                        </select>
+                        <small class="field-hint" id="vehicle-hint"></small>
+                        <small class="field-error" data-error="vehicle_id"></small>
+                    </label>
+                    <label class="field">
+                        <span>Dịch vụ</span>
+                        <select name="service_id" id="service-select">
+                            <option value="">Không chọn dịch vụ</option>
+                        </select>
+                        <small class="field-error" data-error="service_id"></small>
+                    </label>
+                    <label class="field">
+                        <span>Điểm đón *</span>
+                        <input type="text" name="pickup_location" maxlength="255" placeholder="Ví dụ: 12 Nguyễn Trãi, Thanh Xuân, Hà Nội" required>
+                        <small class="field-error" data-error="pickup_location"></small>
+                    </label>
+                    <label class="field">
+                        <span>Điểm đến</span>
+                        <input type="text" name="dropoff_location" maxlength="255" placeholder="Ví dụ: Sân bay Nội Bài">
+                        <small class="field-error" data-error="dropoff_location"></small>
+                    </label>
+                    <label class="field">
+                        <span>Ngày đón *</span>
+                        <input type="date" name="pickup_date" id="pickup-date" required>
+                        <small class="field-error" data-error="pickup_date"></small>
+                    </label>
+                    <label class="field">
+                        <span>Giờ đón *</span>
+                        <input type="time" name="pickup_time" required>
+                        <small class="field-error" data-error="pickup_time"></small>
+                    </label>
+                    <label class="field">
+                        <span>Ngày trả</span>
+                        <input type="date" name="return_date" id="return-date">
+                        <small class="field-error" data-error="return_date"></small>
+                    </label>
+                    <label class="field">
+                        <span>Giờ trả</span>
+                        <input type="time" name="return_time">
+                        <small class="field-error" data-error="return_time"></small>
+                    </label>
+                    <label class="field">
+                        <span>Số hành khách</span>
+                        <input type="number" name="number_of_passengers" id="passengers" min="1" step="1" placeholder="Ví dụ: 4">
+                        <small class="field-error" data-error="number_of_passengers"></small>
+                    </label>
+                </div>
+
+                <h2 style="margin-top:26px">Thông tin liên hệ</h2>
+                <div class="form-grid">
+                    <label class="field">
+                        <span>Họ tên *</span>
+                        <input type="text" name="customer_name" maxlength="100" required>
+                        <small class="field-error" data-error="customer_name"></small>
+                    </label>
+                    <label class="field">
+                        <span>Số điện thoại *</span>
+                        <input type="tel" name="customer_phone" maxlength="20" placeholder="Ví dụ: 0912345678" required>
+                        <small class="field-error" data-error="customer_phone"></small>
+                    </label>
+                    <label class="field span-2">
+                        <span>Email</span>
+                        <input type="email" name="customer_email" maxlength="255">
+                        <small class="field-error" data-error="customer_email"></small>
+                    </label>
+                    <label class="field span-2">
+                        <span>Ghi chú</span>
+                        <textarea name="notes" maxlength="2000" placeholder="Số vali, giờ bay, yêu cầu riêng..."></textarea>
+                        <small class="field-error" data-error="notes"></small>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit" id="submit-btn">Gửi yêu cầu đặt xe</button>
+                    <span class="muted">Bằng cách gửi, bạn đồng ý được liên hệ để xác nhận đơn.</span>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+<div id="site-footer"></div>
+<script type="module" src="../../assets/js/pages/booking.js"></script>
+</body>
+</html>

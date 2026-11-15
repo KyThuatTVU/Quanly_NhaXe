@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Liên hệ — Xe Hợp Đồng Tháo Vy</title>
+    <link rel="stylesheet" href="../../assets/css/app.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="site-main">
+    <section class="section">
+        <div class="container detail-grid">
+            <div>
+                <h1>Liên hệ</h1>
+                <p class="muted">Gửi câu hỏi hoặc yêu cầu tư vấn, chúng tôi phản hồi trong giờ làm việc.</p>
+                <div id="page-alert" class="alert-slot"></div>
+
+                <form class="form-card" id="contact-form" style="margin-top:18px" novalidate>
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Họ tên *</span>
+                            <input type="text" name="name" maxlength="100" required>
+                            <small class="field-error" data-error="name"></small>
+                        </label>
+                        <label class="field">
+                            <span>Số điện thoại *</span>
+                            <input type="tel" name="phone" maxlength="20" placeholder="Ví dụ: 0912345678" required>
+                            <small class="field-error" data-error="phone"></small>
+                        </label>
+                        <label class="field span-2">
+                            <span>Email</span>
+                            <input type="email" name="email" maxlength="255">
+                            <small class="field-error" data-error="email"></small>
+                        </label>
+                        <label class="field span-2">
+                            <span>Tiêu đề</span>
+                            <input type="text" name="subject" maxlength="255" placeholder="Ví dụ: Cần thuê xe 16 chỗ đi Hạ Long">
+                            <small class="field-error" data-error="subject"></small>
+                        </label>
+                        <label class="field span-2">
+                            <span>Nội dung *</span>
+                            <textarea name="message" maxlength="5000" required placeholder="Thời gian, điểm đi, điểm đến, số người..."></textarea>
+                            <small class="field-error" data-error="message"></small>
+                        </label>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit" id="contact-btn">Gửi liên hệ</button>
+                    </div>
+                </form>
+            </div>
+
+            <aside class="info-card">
+                <h2>Thông tin công ty</h2>
+                <dl class="info-list" id="contact-info"></dl>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<div id="site-footer"></div>
+<script type="module" src="../../assets/js/pages/contact.js"></script>
+</body>
+</html>

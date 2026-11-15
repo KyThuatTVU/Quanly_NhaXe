@@ -26,7 +26,6 @@ return static function (Router $router): void {
     // ------------------------------------------------------------------
     // Công khai (website khách)
     // ------------------------------------------------------------------
-    $router->get('/', [HealthController::class, 'index']);
     $router->get('/api/health', [HealthController::class, 'index']);
     $router->get('/api/auth/csrf', [AuthController::class, 'csrf']);
     $router->post('/api/auth/login', [AuthController::class, 'login'], [CsrfMiddleware::class]);

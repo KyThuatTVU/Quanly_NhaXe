@@ -53,9 +53,20 @@ final class Response
         return new self($body, $status, $headers);
     }
 
+    public static function html(string $body, int $status = 200): self
+    {
+        return new self($body, $status, ['Content-Type' => 'text/html; charset=utf-8']);
+    }
+
     public function withHeader(string $name, string $value): self
     {
         $this->headers[$name] = $value;
+        return $this;
+    }
+
+    public function withStatus(int $status): self
+    {
+        $this->status = $status;
         return $this;
     }
 

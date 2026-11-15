@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gửi đánh giá — Xe Hợp Đồng Tháo Vy</title>
+    <link rel="stylesheet" href="../../assets/css/app.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="site-main">
+    <section class="section">
+        <div class="container">
+            <h1>Gửi đánh giá chuyến đi</h1>
+            <p class="muted">Bạn có thể đánh giá khi đơn đã hoàn thành. Mỗi đơn chỉ đánh giá một lần.</p>
+            <div id="page-alert" class="alert-slot"></div>
+
+            <form class="form-card" id="review-form" style="margin-top:18px;max-width:720px" novalidate>
+                <div class="form-grid">
+                    <label class="field">
+                        <span>Mã đơn *</span>
+                        <input type="text" name="booking_code" placeholder="Ví dụ: TV2609200001" required>
+                        <small class="field-error" data-error="booking_code"></small>
+                    </label>
+                    <label class="field">
+                        <span>Số điện thoại *</span>
+                        <input type="tel" name="phone" placeholder="Số điện thoại khi đặt xe" required>
+                        <small class="field-error" data-error="phone"></small>
+                    </label>
+                </div>
+
+                <div class="field" style="margin-top:16px">
+                    <span>Số sao *</span>
+                    <div class="rating-input">
+                        <label><input type="radio" name="rating" value="5" required> 5 sao</label>
+                        <label><input type="radio" name="rating" value="4"> 4 sao</label>
+                        <label><input type="radio" name="rating" value="3"> 3 sao</label>
+                        <label><input type="radio" name="rating" value="2"> 2 sao</label>
+                        <label><input type="radio" name="rating" value="1"> 1 sao</label>
+                    </div>
+                    <small class="field-error" data-error="rating"></small>
+                </div>
+
+                <label class="field" style="margin-top:16px">
+                    <span>Nhận xét</span>
+                    <textarea name="comment" maxlength="2000" placeholder="Chia sẻ trải nghiệm của bạn về chuyến đi..."></textarea>
+                    <small class="field-error" data-error="comment"></small>
+                </label>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit" id="review-btn">Gửi đánh giá</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+<div id="site-footer"></div>
+<script type="module" src="../../assets/js/pages/reviews.js"></script>
+</body>
+</html>
