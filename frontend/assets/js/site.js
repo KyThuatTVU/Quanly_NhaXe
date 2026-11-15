@@ -62,7 +62,9 @@ export function pageUrl(path = '/') {
 }
 
 export function assetPath(path) {
-  return `${SITE_BASE}/assets/${String(path).replace(/^\/+/, '')}`;
+  const clean = String(path).replace(/^\/+/, '');
+  const version = window.__ASSET_V ? `?v=${window.__ASSET_V}` : '';
+  return `${SITE_BASE}/assets/${clean}${version}`;
 }
 
 const ESCAPE_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -212,7 +214,7 @@ export function loadSettings(force = false) {
 
 function renderHeader(settings, active) {
   const name = escapeHtml(brandName(settings));
-  const initials = escapeHtml(brandInitials(brandName(settings)));
+  const logo = assetPath('img/logo/logo_chinh_256.png');
   const hotline = settings.hotline || settings.phone || '';
   const phoneHref = String(hotline).replace(/[^\d+]/g, '');
   const links = NAV_ITEMS.map((item) => {
@@ -223,7 +225,7 @@ function renderHeader(settings, active) {
   return `<header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="${pageUrl('/home/')}">
-        <span class="brand-mark">${initials}</span>
+        <img class="brand-logo" src="${logo}" alt="${name}" width="42" height="42">
         <span>
           <strong>${name}</strong>
           <small>Thuê xe hợp đồng 4 - 45 chỗ</small>
@@ -241,6 +243,7 @@ function renderHeader(settings, active) {
 
 function renderFooter(settings) {
   const name = escapeHtml(brandName(settings));
+  const logo = assetPath('img/logo/logo_chinh_256.png');
   const address = escapeHtml(settings.address || '');
   const phone = escapeHtml(settings.phone || '');
   const email = escapeHtml(settings.email || '');
@@ -250,7 +253,10 @@ function renderFooter(settings) {
   return `<footer class="site-footer">
     <div class="container footer-grid">
       <div>
-        <h3>${name}</h3>
+        <div class="footer-brand">
+          <img class="footer-logo" src="${logo}" alt="${name}" width="44" height="44" loading="lazy">
+          <h3>${name}</h3>
+        </div>
         <p>${description}</p>
         ${hours ? `<p class="muted">${hours}</p>` : ''}
       </div>

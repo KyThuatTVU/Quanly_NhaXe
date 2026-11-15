@@ -1,11 +1,10 @@
 <?php
 $brandName = trim((string) ($site['name'] ?? '')) ?: 'Nhà xe';
-$brandInitials = brand_initials($brandName);
 ?>
 <header class="site-header">
     <div class="container header-inner">
         <a class="brand" href="<?= url('/') ?>">
-            <span class="brand-mark"><?= e($brandInitials) ?></span>
+            <img class="brand-logo" src="<?= asset('img/logo/logo_chinh_256.png') ?>" alt="<?= e($brandName) ?>" width="42" height="42">
             <span class="brand-text">
                 <strong><?= e($brandName) ?></strong>
                 <small>Thuê xe hợp đồng 4 - 45 chỗ</small>

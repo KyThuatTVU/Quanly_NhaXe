@@ -90,15 +90,54 @@ if ($exists && $route !== '' && !str_ends_with($uri, '/')) {
 
 header('Content-Type: text/html; charset=UTF-8');
 header('X-Content-Type-Options: nosniff');
+// HTML phải được kiểm tra lại mỗi lần tải để thay đổi hiện ra ngay
+header('Cache-Control: no-cache, must-revalidate');
+
+$assetDir = __DIR__ . '/frontend/assets';
+$assetVersion = (static function (string $dir): int {
+    $latest = 0;
+    if (!is_dir($dir)) {
+        return $latest;
+    }
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
+    );
+    foreach ($iterator as $file) {
+        if ($file->isFile()) {
+            $latest = max($latest, (int) $file->getMTime());
+        }
+    }
+
+    return $latest;
+})($assetDir);
 
 if ($exists) {
-    readfile(__DIR__ . '/frontend/pages/' . $routes[$route]);
+    $html = (string) file_get_contents(__DIR__ . '/frontend/pages/' . $routes[$route]);
+    // Gắn ?v=<mtime> vào CSS/JS để trình duyệt không dùng bản cache cũ
+    $html = preg_replace_callback(
+        '#(?:\.\./)+assets/([\w./-]+\.(?:css|js))#i',
+        static function (array $match) use ($assetDir): string {
+            $file = $assetDir . '/' . $match[1];
+            $version = is_file($file) ? (int) filemtime($file) : 0;
+
+            return $match[0] . '?v=' . $version;
+        },
+        $html,
+    ) ?? $html;
+    // Ảnh do JS chèn (logo, banner) cũng lấy đúng phiên bản hiện tại
+    $html = preg_replace(
+        '#<head>#i',
+        '<head>' . "\n    <script>window.__ASSET_V=" . $assetVersion . ';</script>',
+        $html,
+        1,
+    ) ?? $html;
+    echo $html;
     exit;
 }
 
 http_response_code(404);
 $home = htmlspecialchars($base . '/home/', ENT_QUOTES, 'UTF-8');
-$css = htmlspecialchars($base . '/assets/css/app.css', ENT_QUOTES, 'UTF-8');
+$css = htmlspecialchars($base . '/assets/css/app.css?v=' . $assetVersion, ENT_QUOTES, 'UTF-8');
 ?>
 <!doctype html>
 <html lang="vi">

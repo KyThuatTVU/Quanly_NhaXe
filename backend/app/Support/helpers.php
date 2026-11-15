@@ -38,7 +38,12 @@ function url(string $path = ''): string
 
 function asset(string $path): string
 {
-    return url('assets/' . ltrim($path, '/'));
+    $path = ltrim($path, '/');
+    $file = dirname(__DIR__, 3) . '/frontend/assets/' . $path;
+    // Gắn phiên bản theo thời điểm sửa file để trình duyệt tải bản mới ngay
+    $version = is_file($file) ? '?v=' . filemtime($file) : '';
+
+    return url('assets/' . $path) . $version;
 }
 
 function media(string $path): string

@@ -114,6 +114,11 @@ try {
     $response = $isWeb ? $errorPage(500, $message) : Response::fail($message, 500);
 }
 
+if ($isWeb) {
+    // Trang quản trị là HTML động: không để trình duyệt dùng lại bản cũ
+    $response->withHeader('Cache-Control', 'no-cache, must-revalidate');
+}
+
 $response
     ->withHeader('X-Content-Type-Options', 'nosniff')
     ->withHeader('X-Frame-Options', 'SAMEORIGIN')

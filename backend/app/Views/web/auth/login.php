@@ -1,6 +1,6 @@
 <div class="auth-card">
     <a class="auth-brand" href="<?= url('/') ?>">
-        <span class="brand-mark"><?= e(brand_initials((string) ($site['name'] ?? ''))) ?></span>
+        <img class="brand-logo" src="<?= asset('img/logo/logo_chinh_256.png') ?>" alt="<?= e($site['name'] ?? 'Quản trị') ?>" width="40" height="40">
         <span><?= e($site['name'] ?? 'Quản trị') ?></span>
     </a>
     <h1>Đăng nhập quản trị</h1>
