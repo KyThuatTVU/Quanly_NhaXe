@@ -24,6 +24,8 @@ use App\Http\Middleware\WebAuthMiddleware;
 return static function (Router $router): void {
     $router->get('/admin/login', [AuthController::class, 'showLogin']);
     $router->post('/admin/login', [AuthController::class, 'login'], [[RateLimitMiddleware::class, ['login', 5, 60]], CsrfMiddleware::class]);
+    $router->get('/admin/login/google', [AuthController::class, 'redirectToGoogle'], [[RateLimitMiddleware::class, ['login', 10, 60]]]);
+    $router->get('/admin/login/google/callback', [AuthController::class, 'handleGoogleCallback']);
     $router->post('/admin/logout', [AuthController::class, 'logout'], [WebAuthMiddleware::class]);
 
     $router->group(

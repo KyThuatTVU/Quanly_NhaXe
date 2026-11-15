@@ -33,6 +33,30 @@ final class AuthService
             $this->audit->log($request, 'login_failed', 'users', null, 'Sai thông tin đăng nhập: ' . $login);
             throw new UnauthorizedException('Tên đăng nhập hoặc mật khẩu không đúng');
         }
+
+        return $this->issueSession($user, $request, 'Đăng nhập quản trị');
+    }
+
+    /**
+     * Đăng nhập quản trị bằng email đã xác thực từ Google (không cần mật khẩu).
+     */
+    public function loginWithGoogleEmail(string $email, Request $request): array
+    {
+        $user = $this->users->findByLogin($email);
+        if ($user === null || strcasecmp((string) ($user['email'] ?? ''), $email) !== 0) {
+            $this->audit->log($request, 'login_failed', 'users', null, 'Google: email chưa được cấp quyền: ' . $email);
+            throw new UnauthorizedException('Email Google này chưa được cấp quyền truy cập trang quản trị');
+        }
+
+        return $this->issueSession($user, $request, 'Đăng nhập quản trị qua Google');
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     * @return array{token: string, expires_at: string, user: array<string, mixed>}
+     */
+    private function issueSession(array $user, Request $request, string $auditMessage): array
+    {
         if ((int) $user['is_active'] !== 1) {
             throw new ForbiddenException('Tài khoản đã bị khóa, vui lòng liên hệ quản trị viên');
         }
@@ -50,7 +74,7 @@ final class AuthService
         $user = $this->users->find((int) $user['user_id']) ?? $user;
 
         $request->setAttribute('auth', $user);
-        $this->audit->log($request, 'login', 'users', (int) $user['user_id'], 'Đăng nhập quản trị');
+        $this->audit->log($request, 'login', 'users', (int) $user['user_id'], $auditMessage);
 
         return [
             'token' => $token,

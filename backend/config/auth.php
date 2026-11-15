@@ -11,4 +11,9 @@ return [
     'roles' => ['admin', 'business', 'customer'],
     'admin_roles' => ['admin', 'business'],
     'password_min_length' => 8,
+    // Đăng nhập Google: điền GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET trong .env (không commit).
+    'google' => [
+        'client_id' => (string) Config::env('GOOGLE_CLIENT_ID', ''),
+        'client_secret' => (string) Config::env('GOOGLE_CLIENT_SECRET', ''),
+    ],
 ];
