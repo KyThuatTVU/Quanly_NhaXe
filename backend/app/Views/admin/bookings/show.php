@@ -30,9 +30,9 @@
             <dt>Ngày đón</dt><dd><?= e(\App\Support\Format::date($booking['pickup_date'] ?? null)) ?> <?= e(substr((string) ($booking['pickup_time'] ?? ''), 0, 5)) ?></dd>
             <dt>Ngày trả</dt><dd><?= e(\App\Support\Format::date($booking['return_date'] ?? null)) ?> <?= e(substr((string) ($booking['return_time'] ?? ''), 0, 5)) ?></dd>
             <dt>Xe</dt><dd><?= e($booking['vehicle_name'] ?? '—') ?></dd>
-            <dt>Giá theo ngày</dt><dd><?= e(\App\Support\Format::money($booking['price_per_day'] ?? null)) ?></dd>
-            <dt>Giá theo km</dt><dd><?= e(\App\Support\Format::money($booking['price_per_km'] ?? null)) ?></dd>
-            <dt>Tổng tiền</dt><dd><strong><?= e(\App\Support\Format::money($booking['total_amount'] ?? null)) ?></strong></dd>
+            <dt>Giá theo ngày</dt><dd><span class="data-glass-badge"><?= e(\App\Support\Format::money($booking['price_per_day'] ?? null)) ?></span></dd>
+            <dt>Giá theo km</dt><dd><span class="data-glass-badge"><?= e(\App\Support\Format::money($booking['price_per_km'] ?? null)) ?></span></dd>
+            <dt>Tổng tiền</dt><dd><span class="data-glass-badge" style="font-size:1.05rem; background:linear-gradient(140deg, rgba(255,255,255,0.95), rgba(220,252,231,0.85)); color:var(--forest);"><?= e(\App\Support\Format::money($booking['total_amount'] ?? null)) ?></span></dd>
             <dt>Ngày tạo</dt><dd><?= e(\App\Support\Format::datetime($booking['created_at'] ?? null)) ?></dd>
         </dl>
     </section>

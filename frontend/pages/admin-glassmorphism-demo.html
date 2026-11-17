@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Glassmorphism 3D Glass Frost</title>
+  <!-- Google Fonts: Plus Jakarta Sans & Quicksand -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            heading: ['"Quicksand"', '"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            oceanic: {
+              azure: '#002B8C',
+              sapphire: '#0F52BA',
+              dusk: '#3E5D8E',
+              light: '#E6F0FA',
+            },
+            emerald: {
+              500: '#10B981',
+              600: '#059669',
+              50: '#ECFDF5',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* BỘ KHUNG 4 LỚP CHIỀU SÂU GLASSMORPHISM 3D */
+    .glass-card-3d {
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.90) 0%, rgba(240, 255, 255, 0.72) 100%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      backdrop-filter: blur(16px) saturate(140%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(0, 43, 140, 0.06),
+        0 16px 34px rgba(0, 43, 140, 0.07),
+        0 4px 12px rgba(15, 23, 42, 0.03);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card-3d:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 1),
+        inset 0 -1px 0 rgba(0, 43, 140, 0.1),
+        0 24px 44px rgba(0, 43, 140, 0.12),
+        0 6px 16px rgba(15, 23, 42, 0.05);
+      border-color: rgba(255, 255, 255, 1);
+    }
+
+    .glass-sidebar {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(240, 255, 255, 0.82) 100%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      backdrop-filter: blur(20px) saturate(150%);
+      border-right: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow:
+        inset -1px 0 0 rgba(220, 235, 250, 0.6),
+        4px 0 24px rgba(0, 43, 140, 0.05);
+    }
+
+    .glass-topbar {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.86) 0%, rgba(240, 255, 255, 0.78) 100%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      backdrop-filter: blur(18px) saturate(140%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 16px rgba(0, 43, 140, 0.03);
+    }
+
+    .glass-pill-active {
+      background: linear-gradient(135deg, rgba(15, 82, 186, 0.14) 0%, rgba(0, 43, 140, 0.08) 100%);
+      border-left: 4px solid #0F52BA;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        0 4px 12px rgba(15, 82, 186, 0.15);
+    }
+
+    .btn-3d-sapphire {
+      background: linear-gradient(135deg, #0F52BA 0%, #002B8C 100%);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
+        0 8px 20px rgba(15, 82, 186, 0.35);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-3d-sapphire:hover {
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.6),
+        0 12px 28px rgba(15, 82, 186, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .bg-mesh-ambient {
+      background:
+        radial-gradient(1000px 500px at 5% 5%, rgba(16, 185, 129, 0.09), transparent 70%),
+        radial-gradient(900px 450px at 95% 15%, rgba(15, 82, 186, 0.10), transparent 70%),
+        radial-gradient(800px 400px at 50% 85%, rgba(0, 43, 140, 0.06), transparent 70%),
+        linear-gradient(160deg, #F8FAFC 0%, #F0FDF4 50%, #F0F9FF 100%);
+    }
+
+    /* Tinh chỉnh thanh cuộn đẹp */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+  </style>
+</head>
+<body class="bg-mesh-ambient min-h-screen text-slate-800 font-sans flex antialiased">
+
+  <!-- ================= SIDEBAR (Glass Frost 3D) ================= -->
+  <aside class="glass-sidebar w-64 min-h-screen p-5 flex flex-col justify-between fixed top-0 left-0 z-30">
+    <div>
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 pb-6 border-b border-oceanic-dusk/15">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-oceanic-azure to-oceanic-sapphire flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-oceanic-sapphire/30">
+          🍽️
+        </div>
+        <div>
+          <h1 class="font-heading font-extrabold text-lg text-oceanic-azure leading-tight">LUXE BISTRO</h1>
+          <p class="text-[11px] font-semibold text-oceanic-dusk tracking-wider uppercase">Quản Trị Ẩm Thực</p>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="mt-6 space-y-1.5">
+        <p class="text-[11px] font-bold text-oceanic-dusk/70 tracking-widest uppercase px-3 mb-2">Tổng Quan</p>
+        
+        <a href="#" class="glass-pill-active flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-oceanic-sapphire font-bold text-sm">
+          <svg class="w-5 h-5 text-oceanic-sapphire" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+          Bảng Điều Khiển
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-oceanic-azure hover:bg-white/60 transition-all font-semibold text-sm">
+          <svg class="w-5 h-5 text-oceanic-dusk" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+          Đơn Đặt Món
+          <span class="ml-auto bg-emerald-50 text-emerald-600 border border-emerald-500/30 font-bold text-xs px-2 py-0.5 rounded-full">12 mới</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-oceanic-azure hover:bg-white/60 transition-all font-semibold text-sm">
+          <svg class="w-5 h-5 text-oceanic-dusk" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          Sơ Đồ Bàn Ăn
+        </a>
+
+        <p class="text-[11px] font-bold text-oceanic-dusk/70 tracking-widest uppercase px-3 pt-4 mb-2">Thực Đơn & Kho</p>
+
+        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-oceanic-azure hover:bg-white/60 transition-all font-semibold text-sm">
+          <svg class="w-5 h-5 text-oceanic-dusk" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          Danh Mục Món Ăn
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-oceanic-azure hover:bg-white/60 transition-all font-semibold text-sm">
+          <svg class="w-5 h-5 text-oceanic-dusk" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          Báo Cáo Doanh Thu
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-oceanic-azure hover:bg-white/60 transition-all font-semibold text-sm">
+          <svg class="w-5 h-5 text-oceanic-dusk" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Cài Đặt Hệ Thống
+        </a>
+      </nav>
+    </div>
+
+    <!-- User Profile Footer -->
+    <div class="pt-4 border-t border-oceanic-dusk/15 flex items-center gap-3">
+      <div class="relative">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Admin" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md">
+        <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"></span>
+      </div>
+      <div class="overflow-hidden">
+        <p class="font-bold text-sm text-oceanic-azure truncate">Sarah Jenkins</p>
+        <p class="text-xs text-oceanic-dusk truncate">Head Manager</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="ml-64 flex-1 flex flex-col min-h-screen">
+    
+    <!-- Top Header (Glass Frost) -->
+    <header class="glass-topbar sticky top-0 z-20 px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4 flex-1 max-w-md">
+        <div class="relative w-full">
+          <input type="text" placeholder="Tìm kiếm đơn hàng, số bàn, món ăn..." class="w-full bg-white/70 border border-white/80 rounded-full pl-10 pr-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-oceanic-sapphire/30 focus:border-oceanic-sapphire transition shadow-sm">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <!-- Live Indicator 10% Emerald -->
+        <div class="inline-flex items-center gap-2 bg-white/80 border border-white px-3 py-1.5 rounded-full shadow-sm text-xs font-bold text-emerald-600">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Đang phục vụ: 18 Bàn
+        </div>
+
+        <!-- Notification Bell -->
+        <button class="relative w-10 h-10 rounded-full bg-white/80 border border-white flex items-center justify-center text-slate-600 hover:text-oceanic-azure shadow-sm transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+          <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white"></span>
+        </button>
+
+        <!-- CTA Button 3D Pill -->
+        <button class="btn-3d-sapphire text-white rounded-full px-5 py-2 text-sm font-bold flex items-center gap-2">
+          <span>+ Đặt Bàn Mới</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Dashboard Content Area -->
+    <div class="p-8 space-y-7 flex-1">
+      
+      <!-- Welcome Heading -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="font-heading font-extrabold text-2xl text-oceanic-azure">Tổng Quan Nhà Hàng Hôm Nay</h2>
+          <p class="text-sm text-oceanic-dusk">Cập nhật số liệu kinh doanh thời gian thực • Thứ Ba, 17/11/2026</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="px-4 py-2 bg-white/70 border border-white rounded-xl text-xs font-bold text-oceanic-azure hover:bg-white shadow-sm transition">Xuất Báo Cáo PDF</button>
+        </div>
+      </div>
+
+      <!-- ROW 1: 4 KPI CARDS (Glassmorphism 3D Depth) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- KPI 1 -->
+        <div class="glass-card-3d rounded-2xl p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-oceanic-dusk uppercase tracking-wider">Tổng Doanh Thu</span>
+            <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200/50 flex items-center justify-center text-lg">
+              💵
+            </div>
+          </div>
+          <div class="mt-3">
+            <h3 class="font-heading font-extrabold text-2xl text-oceanic-azure">48.250.000 đ</h3>
+            <div class="flex items-center gap-1.5 mt-2 text-xs font-bold text-emerald-600">
+              <span class="bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                ↑ +14.8%
+              </span>
+              <span class="text-slate-400 font-normal">so với hôm qua</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI 2 -->
+        <div class="glass-card-3d rounded-2xl p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-oceanic-dusk uppercase tracking-wider">Số Đơn Hàng</span>
+            <div class="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200/50 flex items-center justify-center text-lg">
+              📋
+            </div>
+          </div>
+          <div class="mt-3">
+            <h3 class="font-heading font-extrabold text-2xl text-oceanic-azure">142 Đơn</h3>
+            <div class="flex items-center gap-1.5 mt-2 text-xs font-bold text-emerald-600">
+              <span class="bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                ↑ +8.2%
+              </span>
+              <span class="text-slate-400 font-normal">so với tuần trước</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI 3 -->
+        <div class="glass-card-3d rounded-2xl p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-oceanic-dusk uppercase tracking-wider">Lượt Khách Đặt Bàn</span>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/50 flex items-center justify-center text-lg">
+              🍷
+            </div>
+          </div>
+          <div class="mt-3">
+            <h3 class="font-heading font-extrabold text-2xl text-oceanic-azure">384 Khách</h3>
+            <div class="flex items-center gap-1.5 mt-2 text-xs font-bold text-emerald-600">
+              <span class="bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                ↑ +22.4%
+              </span>
+              <span class="text-slate-400 font-normal">công suất 92%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI 4 (AI Recommendation) -->
+        <div class="glass-card-3d rounded-2xl p-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-oceanic-dusk uppercase tracking-wider">Món Đề Xuất AI</span>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200/50 flex items-center justify-center text-lg">
+              ✨
+            </div>
+          </div>
+          <div class="mt-3">
+            <h3 class="font-heading font-extrabold text-xl text-oceanic-azure truncate">Bò Wagyu Nướng Đá</h3>
+            <p class="text-xs text-oceanic-dusk mt-1.5 line-clamp-1">Khuyên tăng 20% nguyên liệu tối nay</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ROW 2: CHARTS (Line Chart & Donut Chart) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Doanh thu theo giờ (Chart.js Line Chart) -->
+        <div class="glass-card-3d rounded-2xl p-6 lg:col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-heading font-extrabold text-lg text-oceanic-azure">Biểu Đồ Doanh Thu Giờ Vàng</h3>
+              <p class="text-xs text-oceanic-dusk">Xu hướng doanh thu theo khung giờ trong ngày</p>
+            </div>
+            <div class="flex items-center gap-1 bg-white/70 p-1 rounded-xl border border-white text-xs font-bold">
+              <button class="px-3 py-1 bg-oceanic-sapphire text-white rounded-lg shadow-sm">Hôm Nay</button>
+              <button class="px-3 py-1 text-slate-500 hover:text-oceanic-azure">Tuần Này</button>
+              <button class="px-3 py-1 text-slate-500 hover:text-oceanic-azure">Tháng Này</button>
+            </div>
+          </div>
+          <div class="h-64">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Món ăn bán chạy (Donut Chart) -->
+        <div class="glass-card-3d rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-heading font-extrabold text-lg text-oceanic-azure">Tỷ Trọng Món Ăn</h3>
+              <p class="text-xs text-oceanic-dusk">Phân bổ doanh thu danh mục</p>
+            </div>
+          </div>
+          <div class="h-48 relative flex items-center justify-center">
+            <canvas id="categoryChart"></canvas>
+          </div>
+          <div class="grid grid-cols-2 gap-2 mt-4 text-xs font-medium text-slate-600">
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-700"></span> Bò Wagyu (38%)</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Hải Sản (26%)</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-sky-400"></span> Rượu Vang (22%)</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-400"></span> Tráng Miệng (14%)</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ROW 3: BẢNG ĐƠN HÀNG MỚI & SƠ ĐỒ BÀN -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Bảng đơn hàng mới nhất -->
+        <div class="glass-card-3d rounded-2xl p-6 lg:col-span-2 overflow-hidden">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h3 class="font-heading font-extrabold text-lg text-oceanic-azure">Đơn Hàng Mới Nhất</h3>
+              <p class="text-xs text-oceanic-dusk">Danh sách các bàn vừa gọi món</p>
+            </div>
+            <a href="#" class="text-xs font-bold text-oceanic-sapphire hover:underline">Xem Tất Cả →</a>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-oceanic-dusk/15 text-[11px] font-extrabold text-oceanic-dusk uppercase tracking-wider">
+                  <th class="pb-3">Mã Đơn</th>
+                  <th class="pb-3">Bàn</th>
+                  <th class="pb-3">Số Lượng Món</th>
+                  <th class="pb-3">Tổng Tiền</th>
+                  <th class="pb-3">Trạng Thái</th>
+                  <th class="pb-3 text-right">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-oceanic-dusk/10 font-medium text-slate-700">
+                <tr class="hover:bg-white/50 transition">
+                  <td class="py-3.5 font-bold text-oceanic-azure">#OD-8924</td>
+                  <td class="py-3.5 font-semibold">Bàn VIP 02</td>
+                  <td class="py-3.5">6 Món</td>
+                  <td class="py-3.5 font-bold text-slate-900">3.450.000 đ</td>
+                  <td class="py-3.5">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-300">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                      Đang chuẩn bị
+                    </span>
+                  </td>
+                  <td class="py-3.5 text-right">
+                    <button class="px-3 py-1 bg-white/80 border border-white text-oceanic-azure font-bold text-xs rounded-lg hover:bg-oceanic-sapphire hover:text-white transition shadow-sm">Xem chi tiết</button>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-white/50 transition">
+                  <td class="py-3.5 font-bold text-oceanic-azure">#OD-8923</td>
+                  <td class="py-3.5 font-semibold">Bàn 08 (Sân Vườn)</td>
+                  <td class="py-3.5">4 Món</td>
+                  <td class="py-3.5 font-bold text-slate-900">1.820.000 đ</td>
+                  <td class="py-3.5">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      Đã lên món
+                    </span>
+                  </td>
+                  <td class="py-3.5 text-right">
+                    <button class="px-3 py-1 bg-white/80 border border-white text-oceanic-azure font-bold text-xs rounded-lg hover:bg-oceanic-sapphire hover:text-white transition shadow-sm">Xem chi tiết</button>
+                  </td>
+                </tr>
+
+                <tr class="hover:bg-white/50 transition">
+                  <td class="py-3.5 font-bold text-oceanic-azure">#OD-8922</td>
+                  <td class="py-3.5 font-semibold">Bàn 14 (Tầng 2)</td>
+                  <td class="py-3.5">8 Món</td>
+                  <td class="py-3.5 font-bold text-slate-900">5.200.000 đ</td>
+                  <td class="py-3.5">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-300">
+                      Chờ thanh toán
+                    </span>
+                  </td>
+                  <td class="py-3.5 text-right">
+                    <button class="px-3 py-1 bg-white/80 border border-white text-oceanic-azure font-bold text-xs rounded-lg hover:bg-oceanic-sapphire hover:text-white transition shadow-sm">Xem chi tiết</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Danh sách bàn đang phục vụ -->
+        <div class="glass-card-3d rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-heading font-extrabold text-lg text-oceanic-azure">Trạng Thái Bàn</h3>
+              <p class="text-xs text-oceanic-dusk">18 / 24 bàn đang có khách</p>
+            </div>
+            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">Trống: 6</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-center">
+              <span class="text-xs font-bold text-emerald-700">BÀN 01</span>
+              <p class="text-[11px] text-emerald-600 font-semibold mt-1">4 Khách</p>
+            </div>
+            <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center">
+              <span class="text-xs font-bold text-amber-700">VIP 01</span>
+              <p class="text-[11px] text-amber-600 font-semibold mt-1">Gọi Món</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white/80 border border-slate-200 text-center opacity-70">
+              <span class="text-xs font-bold text-slate-500">BÀN 03</span>
+              <p class="text-[11px] text-slate-400 font-semibold mt-1">Bàn Trống</p>
+            </div>
+            <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-center">
+              <span class="text-xs font-bold text-emerald-700">BÀN 04</span>
+              <p class="text-[11px] text-emerald-600 font-semibold mt-1">2 Khách</p>
+            </div>
+            <div class="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-center">
+              <span class="text-xs font-bold text-blue-700">VIP 02</span>
+              <p class="text-[11px] text-blue-600 font-semibold mt-1">Tính Tiền</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white/80 border border-slate-200 text-center opacity-70">
+              <span class="text-xs font-bold text-slate-500">BÀN 06</span>
+              <p class="text-[11px] text-slate-400 font-semibold mt-1">Bàn Trống</p>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-oceanic-dusk/15 flex items-center justify-between text-xs font-semibold text-slate-500">
+            <span>🟢 Đang ăn</span>
+            <span>🟡 Chờ món</span>
+            <span>🔵 Thanh toán</span>
+            <span>⚪ Trống</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ================= CHART.JS CONFIGURATION ================= -->
+  <script>
+    // 1. Line Chart: Doanh thu theo giờ (Sapphire Gradient)
+    const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+    const gradientSapphire = ctxRevenue.createLinearGradient(0, 0, 0, 240);
+    gradientSapphire.addColorStop(0, 'rgba(15, 82, 186, 0.40)');
+    gradientSapphire.addColorStop(1, 'rgba(15, 82, 186, 0.00)');
+
+    new Chart(ctxRevenue, {
+      type: 'line',
+      data: {
+        labels: ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+        datasets: [{
+          label: 'Doanh thu (triệu đồng)',
+          data: [4.2, 12.8, 6.5, 5.1, 24.6, 38.5, 18.2],
+          borderColor: '#0F52BA',
+          borderWidth: 3,
+          backgroundColor: gradientSapphire,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#002B8C',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(0, 43, 140, 0.85)',
+            padding: 10,
+            cornerRadius: 10,
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#64748b' }
+          },
+          y: {
+            border: { dash: [4, 4] },
+            grid: { color: 'rgba(226, 232, 240, 0.8)' },
+            ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#64748b' }
+          }
+        }
+      }
+    });
+
+    // 2. Donut Chart: Phân tích món ăn
+    const ctxCat = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctxCat, {
+      type: 'doughnut',
+      data: {
+        labels: ['Bò Wagyu', 'Hải Sản', 'Rượu Vang', 'Tráng Miệng'],
+        datasets: [{
+          data: [38, 26, 22, 14],
+          backgroundColor: ['#002B8C', '#0F52BA', '#38BDF8', '#10B981'],
+          borderWidth: 3,
+          borderColor: '#ffffff',
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '72%',
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

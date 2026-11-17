@@ -62,6 +62,7 @@ $routes = [
     'booking/success' => 'booking/success/index.html',
     'contact' => 'contact/index.html',
     'reviews' => 'reviews/index.html',
+    'admin-demo' => 'admin-glassmorphism-demo.html',
 ];
 
 if (str_starts_with($route, 'frontend/pages/')) {

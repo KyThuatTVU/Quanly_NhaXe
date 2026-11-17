@@ -301,6 +301,186 @@ function bindNavToggle() {
   });
 }
 
+function renderFloatingContact(settings) {
+  const phone = String(settings.hotline || settings.phone || '0787972075').trim();
+  const phoneHref = phone.replace(/[^\d+]/g, '') || '0787972075';
+  const zalo = String(settings.zalo || phone).trim() || '0787972075';
+  const zaloHref = zalo.replace(/[^\d+]/g, '') || '0787972075';
+  const rawFb = String(settings.facebook || '').trim();
+  const facebook = rawFb || 'https://facebook.com/xethaovy';
+  const fbHref = facebook.startsWith('http') ? facebook : `https://${facebook}`;
+
+  return `
+<!-- Floating Contact Buttons Component -->
+<div id="floatingContact" class="fixed left-4 bottom-20 z-50 flex flex-col space-y-8">
+    <!-- Zalo Button -->
+    <div class="floating-btn zalo-btn group">
+        <a href="https://zalo.me/${escapeHtml(zaloHref)}" data-zalo-link target="_blank" rel="noopener" class="relative block">
+            <!-- Main Button -->
+            <div
+                class="w-16 h-16 bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-500 group-hover:scale-125 group-hover:shadow-blue-500/50 group-hover:shadow-2xl border-2 border-blue-300/30">
+                <!-- Zalo Icon -->
+                <div class="relative flex items-center justify-center">
+                    <!-- Zalo Text Logo -->
+                    <div class="text-white font-bold text-lg tracking-wide drop-shadow-lg">
+                        Zalo
+                    </div>
+                    <!-- Inner glow -->
+                    <div
+                        class="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Ripple Effects -->
+            <div class="absolute inset-0 rounded-full bg-blue-400 opacity-40 animate-ping"></div>
+            <div class="absolute inset-0 rounded-full bg-blue-300 opacity-25 animate-ping animation-delay-700"></div>
+            <div class="absolute inset-0 rounded-full bg-blue-500 opacity-15 animate-ping animation-delay-1400"></div>
+
+            <!-- Enhanced Tooltip -->
+            <div
+                class="absolute left-20 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-gray-800 to-gray-900 text-white px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none shadow-xl border border-gray-700">
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>Chat Zalo</span>
+                </div>
+                <div
+                    class="absolute right-full top-1/2 transform -translate-y-1/2 border-8 border-transparent border-r-gray-800">
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Phone Button -->
+    <div class="floating-btn phone-btn group">
+        <a href="tel:${escapeHtml(phoneHref)}" data-phone-link class="relative block">
+            <!-- Main Button -->
+            <div
+                class="w-16 h-16 bg-gradient-to-br from-green-400 via-green-500 to-green-600 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-500 group-hover:scale-125 group-hover:shadow-green-500/50 group-hover:shadow-2xl border-2 border-green-300/30">
+                <!-- Phone Icon -->
+                <div class="relative">
+                    <svg class="w-9 h-9 text-white drop-shadow-lg transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-500"
+                        fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                    </svg>
+                    <!-- Inner glow -->
+                    <div
+                        class="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Ripple Effects -->
+            <div class="absolute inset-0 rounded-full bg-green-400 opacity-40 animate-ping"></div>
+            <div class="absolute inset-0 rounded-full bg-green-300 opacity-25 animate-ping animation-delay-600"></div>
+            <div class="absolute inset-0 rounded-full bg-green-500 opacity-15 animate-ping animation-delay-1200"></div>
+
+            <!-- Enhanced Tooltip -->
+            <div
+                class="absolute left-20 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-gray-800 to-gray-900 text-white px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none shadow-xl border border-gray-700">
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>Gọi: <span data-phone>${escapeHtml(phone)}</span></span>
+                </div>
+                <div
+                    class="absolute right-full top-1/2 transform -translate-y-1/2 border-8 border-transparent border-r-gray-800">
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Facebook Button -->
+    <div class="floating-btn facebook-btn group">
+        <a href="${escapeHtml(fbHref)}" data-facebook-link target="_blank" rel="noopener" class="relative block">
+            <!-- Main Button -->
+            <div
+                class="w-16 h-16 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-2xl transform transition-all duration-500 group-hover:scale-125 group-hover:shadow-blue-600/50 group-hover:shadow-2xl border-2 border-blue-400/30">
+                <!-- Facebook Icon -->
+                <div class="relative">
+                    <svg class="w-9 h-9 text-white drop-shadow-lg transform group-hover:scale-110 transition-all duration-500"
+                        fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <!-- Inner glow -->
+                    <div
+                        class="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Ripple Effects -->
+            <div class="absolute inset-0 rounded-full bg-blue-400 opacity-40 animate-ping"></div>
+            <div class="absolute inset-0 rounded-full bg-blue-300 opacity-25 animate-ping animation-delay-700"></div>
+            <div class="absolute inset-0 rounded-full bg-blue-500 opacity-15 animate-ping animation-delay-1400"></div>
+
+            <!-- Enhanced Tooltip -->
+            <div
+                class="absolute left-20 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-gray-800 to-gray-900 text-white px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none shadow-xl border border-gray-700">
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                    <span>Facebook</span>
+                </div>
+                <div
+                    class="absolute right-full top-1/2 transform -translate-y-1/2 border-8 border-transparent border-r-gray-800">
+                </div>
+            </div>
+        </a>
+    </div>
+</div>`;
+}
+
+function initFloatingContactEvents() {
+  const floatingContact = document.getElementById('floatingContact');
+  if (!floatingContact || floatingContact.__bound) return;
+  floatingContact.__bound = true;
+
+  // Luôn cố định trên màn hình, không bị ẩn khi cuộn trang
+  floatingContact.style.transform = 'none';
+  floatingContact.style.opacity = '1';
+
+  const buttons = floatingContact.querySelectorAll('a');
+  buttons.forEach((button) => {
+    button.addEventListener('click', function () {
+      const btn = this.querySelector('.w-16, .w-14');
+      if (btn) {
+        btn.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          btn.style.transform = '';
+        }, 150);
+      }
+      const badge = this.querySelector('.notification-badge');
+      if (badge) badge.remove();
+    });
+    button.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.click();
+      }
+    });
+  });
+
+  window.toggleFloatingContact = function (show = true) {
+    const el = document.getElementById('floatingContact');
+    if (el) el.style.display = show ? 'flex' : 'none';
+  };
+
+  window.addContactNotification = function (type, count) {
+    const el = document.getElementById('floatingContact');
+    const button = el?.querySelector(`.${type}-btn`);
+    if (button) {
+      const existingBadge = button.querySelector('.notification-badge');
+      if (existingBadge) existingBadge.remove();
+      if (count > 0) {
+        const badge = document.createElement('div');
+        badge.className = 'notification-badge';
+        badge.textContent = count > 9 ? '9+' : count;
+        button.appendChild(badge);
+      }
+    }
+  };
+}
+
 function applySettings(settings, active) {
   const previous = currentSettings;
   currentSettings = settings;
@@ -311,6 +491,15 @@ function applySettings(settings, active) {
 
   const footer = document.getElementById('site-footer');
   if (footer) footer.innerHTML = renderFooter(settings);
+
+  const floatingHtml = renderFloatingContact(settings);
+  const existingFloating = document.getElementById('floatingContact');
+  if (existingFloating) {
+    existingFloating.outerHTML = floatingHtml;
+  } else {
+    document.body.insertAdjacentHTML('beforeend', floatingHtml);
+  }
+  initFloatingContactEvents();
 
   bindNavToggle();
 

@@ -66,6 +66,22 @@ async function loadHome() {
     model.posts.map(postCard).join('') || emptyState('Chưa có bài viết nào.');
 }
 
+function initCarVideo() {
+  const overlay = document.getElementById('video-poster-overlay');
+  const video = document.getElementById('car-video-player');
+  if (!overlay || !video) return;
+
+  const startPlay = () => {
+    overlay.classList.add('is-playing');
+    video.play().catch(() => {});
+  };
+
+  overlay.addEventListener('click', startPlay);
+  video.addEventListener('play', () => overlay.classList.add('is-playing'));
+}
+
+initCarVideo();
+
 try {
   await loadHome();
   setAlert(alertBox, '');

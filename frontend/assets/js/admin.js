@@ -191,6 +191,8 @@
   }
 
   function mountIndicator() {
+    // Chỉ gắn indicator trên màn hình rộng để tránh chật chội trên mobile
+    if (window.innerWidth <= 640) return;
     const target = document.querySelector('.admin-topbar-left > div');
     if (!target || target.querySelector('.live-indicator')) return;
 
@@ -201,6 +203,37 @@
     target.appendChild(indicator);
   }
 
+  // Khởi tạo Drawer Mobile Menu & Bottom Dock
+  function initMobileMenu() {
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const closeBtn = document.getElementById('sidebarCloseBtn');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const moreBtn = document.getElementById('dockMoreBtn');
+
+    function openSidebar() {
+      document.body.classList.add('sidebar-open');
+    }
+
+    function closeSidebar() {
+      document.body.classList.remove('sidebar-open');
+    }
+
+    if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
+    if (moreBtn) moreBtn.addEventListener('click', openSidebar);
+    if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+    if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+    // Tự động đóng drawer khi nhấp vào bất kỳ link nào
+    document.querySelectorAll('.admin-nav-link').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 900) {
+          closeSidebar();
+        }
+      });
+    });
+  }
+
+  initMobileMenu();
   mountIndicator();
   window.setInterval(autoRefresh, REFRESH_INTERVAL);
   document.addEventListener('visibilitychange', () => {
